@@ -1,9 +1,12 @@
 #!/bin/python3
 
 # from tkinter import *
-from tkinter import font
-import tkinter as tk
-
+try:
+    from tkinter import font
+    import tkinter as tk
+except:
+    from Tkinter import font
+    import Tkinter as tk
 # from _thread import *
 import threading,socket,time
 
@@ -51,8 +54,12 @@ def insertt(text,message,tag):
 
 
 def receive(message_rcv,text):
-    text.config(state=tk.NORMAL)
-    text.delete("1.0",tk.END)
+    try:
+        text.config(state=tk.NORMAL)
+        text.delete("1.0",tk.END)
+    except RuntimeError:
+        print("Forcibly exiting...")
+        exit()
     for line in message_rcv.splitlines():
         try:
             messaget=line.split("//")
@@ -81,7 +88,12 @@ def threadclient():
     except ConnectionRefusedError:
         receive(messages.connection_error,text)
     receive(messages.connected,text)
-    s.send(bytes("{}".format(NAME),'UTF-8'))
+    try:
+        s.send(bytes("{}".format(NAME),'UTF-8'))
+    except BrokenPipeError:
+        receive(messages.handshake_error,text)
+        time.sleep(1)
+        exit()
 
     while 1:
         try:
@@ -106,4 +118,4 @@ if __name__ == '__main__':
     thread.start()
 
     root.mainloop()
-    thread.join()
+    exit()

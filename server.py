@@ -1,5 +1,9 @@
 #!/bin/python3
 import threading,socket,time
+import messages
+
+SLEEP_SCHEDULER=0.5
+global_status=messages.global_status[:]
 
 class ClientThread(threading.Thread):
     def __init__(self,clientAddress,clientsocket):
@@ -10,19 +14,18 @@ class ClientThread(threading.Thread):
         # Getting basic information, mainly name
         print ("Connection from : ", clientAddress)
         data = self.csocket.recv(2048)
-        msg = data.decode()
-        name=data.lowercase()
-        print ("Connection from : ", clientAddress,name)
+        name = data.decode()
+        print ("{} connected @ {} ".format(name,clientAddress))
+        self.csocket.send(bytes(messages.handshake.format(name),'UTF-8'))
 
-        k=1
         while True:
             try:
-                time.sleep(1)
-                self.csocket.send(bytes("{}".format(k),'UTF-8'))
-                k+=1
+                time.sleep(SLEEP_SCHEDULER)
+                self.csocket.send(bytes(global_status,'UTF-8'))
             except ConnectionResetError:
-                print ("Client at ", clientAddress , " disconnected...")
+                print (name, clientAddress , " disconnected...")
                 break
+
 LOCALHOST = "127.0.0.1"
 PORT = 12345
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

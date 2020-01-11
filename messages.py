@@ -8,9 +8,32 @@ connected="""Checking all systems // Nominal
 
 Connection // Uplink established
 
-Connection // Awaiting for message // warning
+Connection // Initiating handshake // warning
 
 Quality // Good // green"""
+
+handshake = """Checking all systems // Nominal
+
+Connection // Uplink established
+
+Connection // Handshake received
+
+             Welcome {}
+
+Quality // Good // green"""
+
+handshake_error= """Checking all systems // Nominal
+
+Connection // Uplink established
+
+Connection // Handshake error // red
+
+             Could not send through handshake, connection has been severed
+
+Quality // Good // green"""
+
+global_status = """ You are sucessfuly connected"""
+
 
 connection_error="""Communication error // Connection refused // red
 
