@@ -1,38 +1,38 @@
-base="""+-------------------------------------------------------
+base="""+---------------------------------------------------------------------------
 | {title}
-+-------------------------------------------------------
++---------------------------------------------------------------------------
 | Main deck // {self.deck}
 | Comunication arrays // {self.comms}
 | {self.main_events}
-+-----------------
++-----------------------------
 | Inertia compensator // {self.inertia}
 | Vital systems // {self.survival}
 | {self.vital_events}
-+-----------------
++-----------------------------
 | Reactor status // {self.reactor}
 | {self.reactor_events}
-+-----------------
++-----------------------------
 | Propultion status // {self.propulsion}
 | Lightfold engines // {self.lightfold}
-+-----------------
++-----------------------------
 | Docks // {self.docks}
 | Medical Bay // {self.medical}
 | Quarters // {self.quarters}
 | Baracks // {self.baracks}
 | {self.misc_events}
-+-------------------------------------------------------
++---------------------------------------------------------------------------
 
-+----
++-----------------------------
 | Users connected {users}
-+-------------------------------------------------------
++---------------------------------------------------------------------------
 """
 
 
 class messageStat():
     def __init__(self):
-        self.cc=self.genempty([16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,61,62])
-        self.on=self.genempty([44])
-        self.off=self.genempty([44])
+        self.cc=self.genall([16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,61,62],-1)
+        self.note=self.genall([1,3, 4,6, 7,9, 10,12, 13,15, 16,18,19,21,22,24],0)
+        # self.off=self.genempty([44])
         empty=lambda : ""
 
         self.update()
@@ -49,15 +49,26 @@ class messageStat():
         elif val < 30:
             return "[{}%] Critical//red".format(pct)
         elif val < 50:
-            return "[{}%] Warning//bigwarning".format(pct)
+            return "[{}%] Warning//borange".format(pct)
         elif val < 80:
-            return "[{}%] Malfunction//warning".format(pct)
+            return "[{}%] Malfunction//orange".format(pct)
         elif val < 110:
             return "[{}%] Sub-Optimal//green".format(pct)
         elif val < 127:
-            return "[{}%] Nominal//blue".format(pct)
+            return "[{}%] Nominal//bblue".format(pct)
         elif val == 127:
-            return "[{}%] Optimal//green".format(pct)
+            return "[{}%] Optimal//bgreen".format(pct)
+
+    def reactor_ev(self):
+        ret=""
+        if self.note[7]:
+            ret+="REACTOR MELTDOWN "
+        if self.note[9]:
+            ret+="RADIATION LEAK "
+
+        if ret != "":
+            ret="CRITICAL ISSUE//"+ret+"//bred"
+        return ret
 
     def update(self):
         self.deck=self.classical(self.cc[16])
@@ -76,30 +87,38 @@ class messageStat():
         self.quarters=self.classical(self.cc[48])
         self.baracks=self.classical(self.cc[50])
 
-        self.vital_events=""
-        self.reactor_events=""
         self.main_events=""
+        self.vital_events=""
+        self.reactor_events=self.reactor_ev()
         self.misc_events=""
 
-    def genempty(self,t):
+    def genall(self,t,val):
         content={}
         for nb in t:
-            content[nb]=-1
+            content[nb]=val
         return content
 
 
+
     def generateMessage(self,users=""):
-        return base.format(title="I.S.F Espérance : Dashboard", self=self ,users=users)
+        return base.format(title="I.S.F Esperance : Dashboard", self=self ,users=users)
 
     def updateMessage(self,message):
-        print(message)
+        # print(message)
         if message.type=="control_change":
             try:
                 self.cc[message.control]=message.value
             except:
                 pass
         elif message.type=="note_on":
-            print("on")
+            try:
+                if self.note[message.note]:
+                    self.note[message.note]=0
+                else:
+                    self.note[message.note]=1
+                # print (self.note)
+            except:
+                pass
         elif message.type=="note_on":
             print("off")
         self.update()

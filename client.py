@@ -33,13 +33,18 @@ font.families()
 
 text = tk.Text(root,bg="black",font=main,padx=12,pady=12,cursor="cross")
 text.tag_config("default", background="black", foreground="green")
-text.tag_config("info", background="black", foreground="green")
-text.tag_config("red", background="red", foreground="black")
-text.tag_config("green", background="green", foreground="black")
-text.tag_config("blue", background="black", foreground="blue")
 
-text.tag_config("warning", background="black", foreground="orange")
-text.tag_config("bigwarning", background="orange", foreground="black")
+text.tag_config("bred", background="red", foreground="black")
+text.tag_config("red", background="black", foreground="red")
+
+text.tag_config("bgreen", background="green", foreground="black")
+text.tag_config("green", background="black", foreground="green")
+
+text.tag_config("blue", background="black", foreground="blue")
+text.tag_config("bblue", background="blue", foreground="black")
+
+text.tag_config("orange", background="black", foreground="orange")
+text.tag_config("borange", background="orange", foreground="black")
 
 text.tag_config("title", background="black", foreground="green")#,font=mainbold)
 
@@ -55,6 +60,16 @@ def insertt(text,message,tag):
     except:
         pass
 
+
+def superstyle(text):
+    try:
+        if text[0]=="!":
+            return "red"
+        elif text[0]==".":
+            return "orange"
+        return "default"
+    except:
+        return "default"
 
 def receive(message_rcv,text):
     try:
@@ -76,12 +91,12 @@ def receive(message_rcv,text):
                 style=messaget[2]
             elif len(messaget)==2:
                 style="default"
-            insertt(text,msg,"title")
+            insertt(text,msg,superstyle(msg))
             insertt(text," "+"."*remaining+" ","default")
             insertt(text,info,style)
             insertt(text,"\n","default")
         except:
-            insertt(text,line,"info")
+            insertt(text,line,superstyle(line))
             insertt(text,"\n","default")
     text.config(state=tk.DISABLED)
 
@@ -103,7 +118,7 @@ def threadclient():
 
     while 1:
         try:
-            data=s.recv(1024)
+            data=s.recv(2048)
             if data!=0:
                 receive(str(data.decode('UTF-8')),text)
             else:

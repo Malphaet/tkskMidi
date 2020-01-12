@@ -3,7 +3,7 @@ import threading,socket,time
 import patch,messages
 import mido
 
-SLEEP_SCHEDULER=1   
+SLEEP_SCHEDULER=1
 HOST = "127.0.0.1"
 PORT = 12345
 MIDINAME='MIDI Mix 0'
