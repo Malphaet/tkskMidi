@@ -13,7 +13,7 @@ import threading,socket,time
 #################
 # IMPORTANT INFO
 FONT="White Rabbit"#"NovaMono"#'Speculum'
-FONTSIZE=19
+FONTSIZE=18
 WIDTH=85
 WINDOWSIZE="1250x800"
 HOST,PORT=("127.0.0.1",12345)
@@ -31,12 +31,15 @@ main = font.Font(family=FONT, size=FONTSIZE)
 
 font.families()
 
-text = tk.Text(root,bg="black",font=main,padx=12,pady=12,cursor="trek")
+text = tk.Text(root,bg="black",font=main,padx=12,pady=12,cursor="cross")
 text.tag_config("default", background="black", foreground="green")
 text.tag_config("info", background="black", foreground="green")
 text.tag_config("red", background="red", foreground="black")
 text.tag_config("green", background="green", foreground="black")
+text.tag_config("blue", background="black", foreground="blue")
+
 text.tag_config("warning", background="black", foreground="orange")
+text.tag_config("bigwarning", background="orange", foreground="black")
 
 text.tag_config("title", background="black", foreground="green")#,font=mainbold)
 
@@ -48,7 +51,7 @@ def exit(event=None):
 
 def insertt(text,message,tag):
     try:
-        text.insert(tk.END,message,tag)
+        text.insert(tk.INSERT,message,tag)
     except:
         pass
 
@@ -60,8 +63,11 @@ def receive(message_rcv,text):
     except RuntimeError:
         print("Forcibly exiting...")
         exit()
+    # k=0
     for line in message_rcv.splitlines():
+        # k+=1
         try:
+            # text.delete("{}.0".format(k),"{}.end".format(k))#"{}.first".format(k),"{}.last".format(k))#tk.END)
             messaget=line.split("//")
             msg=messaget[0].strip(" ")
             info=messaget[1].strip(" ")
@@ -90,7 +96,7 @@ def threadclient():
     receive(messages.connected,text)
     try:
         s.send(bytes("{}".format(NAME),'UTF-8'))
-    except BrokenPipeError:
+    except (BrokenPipeError,OSError):
         receive(messages.handshake_error,text)
         time.sleep(1)
         exit()

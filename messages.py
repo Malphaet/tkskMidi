@@ -28,7 +28,7 @@ Connection // Uplink established
 
 Connection // Handshake error // red
 
-             Could not send through handshake, connection has been severed
+             Could not initiate handshake, connection has been severed
 
 Quality // Good // green"""
 
