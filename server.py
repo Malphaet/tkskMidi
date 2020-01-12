@@ -4,7 +4,7 @@ import patch,messages
 import mido
 
 SLEEP_SCHEDULER=1
-HOST = "127.0.0.1"
+HOST = "192.168.1.13"
 PORT = 12345
 MIDINAME='MIDI Mix 0'
 

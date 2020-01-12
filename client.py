@@ -16,13 +16,13 @@ FONT="White Rabbit"#"NovaMono"#'Speculum'
 FONTSIZE=18
 WIDTH=85
 WINDOWSIZE="1250x800"
-HOST,PORT=("127.0.0.1",12345)
+HOST,PORT=("192.168.1.13",12345)
 NAME="Aamstrang Karpov"
 ####################
 # Quick and dirty code
 root = tk.Tk()
 root.title("Centauri Remote Viewer 0.9")
-root.geometry("1300x600")
+root.geometry(WINDOWSIZE)
 root.bind('<Control-q>', exit)
 root.bind('<Control-c>', exit)
 
@@ -42,6 +42,18 @@ text.tag_config("green", background="black", foreground="green")
 
 text.tag_config("blue", background="black", foreground="blue")
 text.tag_config("bblue", background="blue", foreground="black")
+
+text.tag_config("sblue", background="black", foreground="SteelBlue")
+text.tag_config("bsblue", background="SteelBlue", foreground="black")
+
+text.tag_config("dgreen", background="black", foreground="dark green")
+text.tag_config("bdgreen", background="dark green", foreground="black")
+
+text.tag_config("lgreen", background="black", foreground="lawn green")
+text.tag_config("blgreen", background="lawn green", foreground="black")
+
+text.tag_config("gold", background="black", foreground="gold")
+text.tag_config("bgold", background="gold", foreground="black")
 
 text.tag_config("orange", background="black", foreground="orange")
 text.tag_config("borange", background="orange", foreground="black")

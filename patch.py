@@ -55,7 +55,7 @@ class messageStat():
         elif val < 110:
             return "[{}%] Sub-Optimal//green".format(pct)
         elif val < 127:
-            return "[{}%] Nominal//bblue".format(pct)
+            return "[{}%] Nominal//sblue".format(pct)
         elif val == 127:
             return "[{}%] Optimal//bgreen".format(pct)
 
