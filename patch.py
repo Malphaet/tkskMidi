@@ -46,21 +46,35 @@ class messageStat():
     def classical(self,val):
         pct=int(val*100/127)
         if val==-1:
-            return "[--] {:>10}//red".format("Unknown")
+            return "[--] {:>11}//red".format("Unknown")
         elif val==0:
-            return "[{}%] {:>10}//red".format(pct,"Lost")
+            return "[{:>2}%] {:>11}//red".format(pct,"Lost")
         elif val < 30:
-            return "[{}%] {:>10}//red".format(pct,"Critical")
+            return "[{:>2}%] {:>11}//red".format(pct,"Critical")
         elif val < 50:
-            return "[{}%] {:>10}//borange".format(pct,"Warning")
+            return "[{:>2}%] {:>11}//borange".format(pct,"Warning")
         elif val < 80:
-            return "[{}%] {:>10}//orange".format(pct,"Malfunction")
+            return "[{:>2}%] {:>11}//orange".format(pct,"Malfunction")
         elif val < 110:
-            return "[{}%] {:>10}//green".format(pct,"Sub-Optimal")
+            return "[{:>2}%] {:>11}//green".format(pct,"Sub-Optimal")
         elif val < 127:
-            return "[{}%] {:>10}//sblue".format(pct,"Nominal")
+            return "[{:>2}%] {:>11}//sblue".format(pct,"Nominal")
         elif val == 127:
-            return "[{}%] {:>10}//bgreen".format(pct,"Optimal")
+            return "[{:>2}%] {:>11}//bgreen".format(pct,"Optimal")
+
+    def powerlevel(self,val):
+        pct=int(val*2)
+        if val==-1:
+            return "[--%]//red".format(pct)
+        if pct < 50:
+            return "[{:>2}%]//sblue".format(pct)
+        if pct < 105:
+            return "[{:>2}%]//green".format(pct)
+        if pct < 175:
+            return "[{:>2}%]//orange".format(pct)
+        if pct < 200:
+            return "[{:>2}%]//red".format(pct)
+        return "[{:>2}%]//bred".format(pct)
 
     def main_ev(self):
         ret=""
@@ -113,7 +127,11 @@ class messageStat():
         if self.note[13]:
             ret+="Electrical Fire ! "
         if self.note[15]:
-            ret+=""
+            ret+="Hull breach ! "
+        if self.note[16]:
+            ret+="Structural integrity critical ! "
+        if self.note[18]:
+            ret+="Foreign object alert !"
 
         if ret != "":
             ret="Critical Issue//"+ret+"//bred"
@@ -127,9 +145,11 @@ class messageStat():
         self.survival=self.classical(self.cc[21])
 
         self.reactor=self.classical(self.cc[24])
+        self.reactor_pw=self.powerlevel(self.cc[25])
 
         self.propulsion=self.classical(self.cc[28])
         self.lightfold=self.classical(self.cc[29])
+        self.propulsion_pw=self.powerlevel(self.cc[30])
 
         self.docks=self.classical(self.cc[46])
         self.medical=self.classical(self.cc[47])
