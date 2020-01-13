@@ -9,15 +9,16 @@ except:
     import Tkinter as tk
 # from _thread import *
 import threading,socket,time
+import config
 
 #################
 # IMPORTANT INFO
-FONT="White Rabbit"#"NovaMono"#'Speculum'
-FONTSIZE=18
-WIDTH=85
-WINDOWSIZE="1250x800"
-HOST,PORT=("192.168.1.13",12345)
-NAME="Aamstrang Karpov"
+FONT=config.FONT #"NovaMono"#'Speculum'
+FONTSIZE=config.FONTSIZE
+WIDTH=config.WIDTH
+WINDOWSIZE=config.WINDOWSIZE
+HOST,PORT=config.HOST,config.PORT
+NAME=config.NAME
 ####################
 # Quick and dirty code
 root = tk.Tk()
@@ -72,13 +73,20 @@ def insertt(text,message,tag):
     except:
         pass
 
+def plain(text,msg,style="default"):
+    insertt(text,msg,style)
 
-def superstyle(text):
+def filled(text,msg1,color1,msg2,color2):
+    pass
+
+def superstyle(obj,text):
     try:
         if text[0]=="!":
             return "red",text[1:]
         elif text[0]==".":
             return "orange",text[1:]
+        elif text[0]=="#":
+            filled(obj,text,"")
         return "default",text
     except:
         return "default",text
