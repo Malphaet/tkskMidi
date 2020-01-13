@@ -1,6 +1,6 @@
-base="""+---------------------------------------------------------------------------
+base="""+--------------------------------------------------------------------------------------
 | {title}
-+---------------------------------------------------------------------------
++--------------------------------------------------------------------------------------
 | Main deck // {self.deck}
 | Comunication arrays // {self.comms}
 | {self.main_events}
@@ -10,21 +10,24 @@ base="""+-----------------------------------------------------------------------
 | {self.vital_events}
 +-----------------------------
 | Reactor status // {self.reactor}
+| Reactor power // {self.reactor_pw}
 | {self.reactor_events}
 +-----------------------------
 | Propultion status // {self.propulsion}
 | Lightfold engines // {self.lightfold}
+| Propultion power // {self.propulsion_pw}
+| {self.prop_events}
 +-----------------------------
 | Docks // {self.docks}
 | Medical Bay // {self.medical}
 | Quarters // {self.quarters}
 | Baracks // {self.baracks}
 | {self.misc_events}
-+---------------------------------------------------------------------------
++--------------------------------------------------------------------------------------
 
 +-----------------------------
 | Users connected {users}
-+---------------------------------------------------------------------------
++--------------------------------------------------------------------------------------
 """
 
 
@@ -34,7 +37,7 @@ class messageStat():
         self.note=self.genall([1,3, 4,6, 7,9, 10,12, 13,15, 16,18,19,21,22,24],0)
         # self.off=self.genempty([44])
         empty=lambda : ""
-
+        align=11
         self.update()
 
     def pct(self,val):
@@ -43,31 +46,77 @@ class messageStat():
     def classical(self,val):
         pct=int(val*100/127)
         if val==-1:
-            return "[--] Unknown//red".format(pct)
+            return "[--] {:>10}//red".format("Unknown")
         elif val==0:
-            return "[{}%] Lost//red".format(pct)
+            return "[{}%] {:>10}//red".format(pct,"Lost")
         elif val < 30:
-            return "[{}%] Critical//red".format(pct)
+            return "[{}%] {:>10}//red".format(pct,"Critical")
         elif val < 50:
-            return "[{}%] Warning//borange".format(pct)
+            return "[{}%] {:>10}//borange".format(pct,"Warning")
         elif val < 80:
-            return "[{}%] Malfunction//orange".format(pct)
+            return "[{}%] {:>10}//orange".format(pct,"Malfunction")
         elif val < 110:
-            return "[{}%] Sub-Optimal//green".format(pct)
+            return "[{}%] {:>10}//green".format(pct,"Sub-Optimal")
         elif val < 127:
-            return "[{}%] Nominal//sblue".format(pct)
+            return "[{}%] {:>10}//sblue".format(pct,"Nominal")
         elif val == 127:
-            return "[{}%] Optimal//bgreen".format(pct)
+            return "[{}%] {:>10}//bgreen".format(pct,"Optimal")
+
+    def main_ev(self):
+        ret=""
+        if self.note[1]:
+            ret+="Electrical surge ! "
+        if self.note[3]:
+            ret+="Uplink lost !"
+
+        if ret != "":
+            ret="Critical Issue//"+ret+"//bred"
+        return ret
+
+    def vital_ev(self):
+        ret=""
+        if self.note[4]:
+            ret+="Microgravity Malfunction ! "
+            color="borange"
+        if self.note[6]:
+            ret+="Oxygen Leak !"
+            color="bred"
+        if ret != "":
+            ret="Critical Issue//"+ret+"//"+color
+        return ret
 
     def reactor_ev(self):
         ret=""
         if self.note[7]:
-            ret+="REACTOR MELTDOWN "
+            ret+="RADIATION LEAK ! "
+            color="borange"
         if self.note[9]:
-            ret+="RADIATION LEAK "
+            ret+="REACTOR MELTDOWN ! "
+            color="bred"
+        if ret != "":
+            ret="Critical Issue//"+ret+"//"+color
+        return ret
+
+    def prop_ev(self):
+        ret=""
+        if self.note[10]:
+            ret+="System Overheating ! "
+        if self.note[12]:
+            ret+="Systemic Failure !"
 
         if ret != "":
-            ret="CRITICAL ISSUE//"+ret+"//bred"
+            ret="Critical Issue//"+ret+"//bred"
+        return ret
+
+    def misc_ev(self):
+        ret=""
+        if self.note[13]:
+            ret+="Electrical Fire ! "
+        if self.note[15]:
+            ret+=""
+
+        if ret != "":
+            ret="Critical Issue//"+ret+"//bred"
         return ret
 
     def update(self):
@@ -87,10 +136,11 @@ class messageStat():
         self.quarters=self.classical(self.cc[48])
         self.baracks=self.classical(self.cc[50])
 
-        self.main_events=""
-        self.vital_events=""
+        self.main_events=self.main_ev()
+        self.vital_events=self.vital_ev()
         self.reactor_events=self.reactor_ev()
-        self.misc_events=""
+        self.prop_events=self.prop_ev()
+        self.misc_events=self.misc_ev()
 
     def genall(self,t,val):
         content={}

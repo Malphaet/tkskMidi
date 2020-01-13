@@ -21,7 +21,7 @@ NAME="Aamstrang Karpov"
 ####################
 # Quick and dirty code
 root = tk.Tk()
-root.title("Centauri Remote Viewer 0.9")
+root.title("Centauri Remote Viewer 1.0")
 root.geometry(WINDOWSIZE)
 root.bind('<Control-q>', exit)
 root.bind('<Control-c>', exit)
@@ -76,12 +76,12 @@ def insertt(text,message,tag):
 def superstyle(text):
     try:
         if text[0]=="!":
-            return "red"
+            return "red",text[1:]
         elif text[0]==".":
-            return "orange"
-        return "default"
+            return "orange",text[1:]
+        return "default",text
     except:
-        return "default"
+        return "default",text
 
 def receive(message_rcv,text):
     try:
@@ -99,56 +99,68 @@ def receive(message_rcv,text):
             msg=messaget[0].strip(" ")
             info=messaget[1].strip(" ")
             remaining=max(0,WIDTH-len(msg)-len(info))
+            stylet="default"
             if len(messaget)==3:
                 style=messaget[2]
             elif len(messaget)==2:
                 style="default"
-            insertt(text,msg,superstyle(msg))
+            elif len(messaget)==4:
+                stylet=messaget[3]
+            insertt(text,msg,stylet)
             insertt(text," "+"."*remaining+" ","default")
             insertt(text,info,style)
             insertt(text,"\n","default")
         except:
-            insertt(text,line,superstyle(line))
+            color,line=superstyle(line)
+            insertt(text,line,color)
             insertt(text,"\n","default")
     text.config(state=tk.DISABLED)
 
 
-def threadclient():
-    time.sleep(1)
-    s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        s.connect((HOST, PORT))
-    except ConnectionRefusedError:
-        receive(messages.connection_error,text)
-    receive(messages.connected,text)
-    try:
-        s.send(bytes("{}".format(NAME),'UTF-8'))
-    except (BrokenPipeError,OSError):
-        receive(messages.handshake_error,text)
-        time.sleep(1)
-        exit()
+def connecting():
+    return socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    while 1:
+def threadclient():
+    receive(messages.opening_text0,text)
+    tryouts=0
+    while 1: # Main connection loop
+        time.sleep(1)
+        s=connecting()
         try:
-            data=s.recv(2048)
-            if data!=0:
-                receive(str(data.decode('UTF-8')),text)
-            else:
+            s.connect((HOST, PORT))
+        except ConnectionRefusedError:
+            tryouts+=1
+            receive(messages.connection_error.format(tnumber=tryouts,tcolor="orange"),text)
+            time.sleep(2)
+            continue
+        receive(messages.connected,text)
+        try:
+            s.send(bytes("{}".format(NAME),'UTF-8'))
+        except (BrokenPipeError,OSError):
+            receive(messages.handshake_error,text)
+            time.sleep(3)
+            continue#exit()
+
+        while 1:
+            try:
+                data=s.recv(2048)
+                if data!=0:
+                    receive(str(data.decode('UTF-8')),text)
+                else:
+                    break
+            except ConnectionResetError:
+                s.close()
+                receive(messages.connection_terminated,text)
+                receive(messages.retrying_connection,text)
+                tryouts=0
                 break
-        except ConnectionResetError:
-            s.close()
-            receive(messages.connection_terminated,text)
-            break
 ################
 # SYSTEM MESSAGE
 
 import messages
 
-message_test2="""Nope"""
 if __name__ == '__main__':
-    receive(messages.opening_text0,text)
     thread=threading.Thread(target=threadclient,args=())
     thread.start()
-
     root.mainloop()
     exit()
