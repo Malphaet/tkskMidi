@@ -13,9 +13,9 @@ base="""!g+---------------------------------------------------------------------
 #g| Reactor power // {self.reactor_pw}
 #g| {self.reactor_events}
 !g+-----------------------------
-#g| Propultion status // {self.propulsion}
+#g| Propulsion status // {self.propulsion}
 #g| Lightfold engines // {self.lightfold}
-#g| Propultion power // {self.propulsion_pw}
+#g| Propulsion power // {self.propulsion_pw}
 #g| {self.prop_events}
 !g+-----------------------------
 #g| Docks // {self.docks}
