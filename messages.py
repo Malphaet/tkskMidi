@@ -1,58 +1,62 @@
-opening_text0="""##  Checking all systems // Nominal
+opening_text0="""#g Checking all systems // Nominal
 
-## Connection // Waiting for upling // orange // bgreen
+#g Connection // Waiting for upling // orange
 
-## Quality // Good // green
+#g Quality // Good // green
 """
-connected="""## Checking all systems // Nominal
+connected="""#g Checking all systems // Nominal
 
-## Connection // Uplink established
+#g Connection // Uplink established
 
-## Connection // Initiating handshake // orange
+#g Connection // Initiating handshake // orange
 
-## Quality // Good // bgreen"""
+#g Quality // Good // bgreen"""
 
-handshake = """## Checking all systems // Nominal
+handshake = """#g Checking all systems // Nominal
 
-## Connection // Uplink established
+#g Connection // Uplink established
 
-## Connection // Handshake received
+#g Connection // Handshake received
 
-##                       Welcome {}
+#g                       Welcome {}
 
-##Quality // Good // bgreen"""
+#g Quality // Good // bgreen"""
 
-handshake_error= """##Checking all systems // Nominal
+handshake_error= """#g Checking all systems // Nominal
 
-##Connection // Uplink established
+#g Connection // Uplink established
 
-##Connection // Handshake error // red
+#g Connection // Handshake error // red
 
 !r             Could not initiate handshake, connection has been severed
 
-## Satus // Fatal // bred
+#g Satus // Fatal // bred
 
-## Quality // Worst // bred"""
+#g Quality // Worst // bred"""
 
-global_status = """## You are sucessfuly connected """
+global_status = """#g You are sucessfuly connected """
 
 
-connection_error="""## Communication error // Connection refused // red
+connection_error="""#g Communication error // Connection refused // red
 
 !r       A communication could not be established with the central network command
 !o       Retrying connection, please wait for uplink or check network redondancies
 
-## Satus // Fatal // bred
-## Quality // Worst // bred"""
 
-connection_terminated="""##                     Connection terminated
 
-## The communication was severed from the central server
+#g Try number // {tnumber} // borange
 
-## Status // Terminated // borange"""
+#g Satus // Fatal // bred
+#g Quality // Worst // bred"""
 
-retrying_connection="""## Checking all systems // Warning //borange
+connection_terminated="""#g                    Connection terminated
 
-## Connection // Retrying connection // orange // bgreen
+#g The communication was severed from the central server
 
-## Quality // Bad // orange"""
+#g Status // Terminated // borange"""
+
+retrying_connection="""#g Checking all systems // Warning //borange
+
+#G Connection // Retrying connection // orange
+
+#g Quality // Bad // orange"""

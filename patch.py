@@ -1,33 +1,33 @@
-base="""+--------------------------------------------------------------------------------------
-| {title}
-+--------------------------------------------------------------------------------------
-| Main deck // {self.deck}
-| Comunication arrays // {self.comms}
-| {self.main_events}
-+-----------------------------
-| Inertia compensator // {self.inertia}
-| Vital systems // {self.survival}
-| {self.vital_events}
-+-----------------------------
-| Reactor status // {self.reactor}
-| Reactor power // {self.reactor_pw}
-| {self.reactor_events}
-+-----------------------------
-| Propultion status // {self.propulsion}
-| Lightfold engines // {self.lightfold}
-| Propultion power // {self.propulsion_pw}
-| {self.prop_events}
-+-----------------------------
-| Docks // {self.docks}
-| Medical Bay // {self.medical}
-| Quarters // {self.quarters}
-| Baracks // {self.baracks}
-| {self.misc_events}
-+--------------------------------------------------------------------------------------
+base="""!g+--------------------------------------------------------------------------------------
+!g| {title}
+!g+--------------------------------------------------------------------------------------
+#g | Main deck // {self.deck}
+#g| Comunication arrays // {self.comms}
+#g| {self.main_events}
+!g+-----------------------------
+#g| Inertia compensator // {self.inertia}
+#g| Vital systems // {self.survival}
+#g| {self.vital_events}
+!g+-----------------------------
+#g| Reactor status // {self.reactor}
+#g| Reactor power // {self.reactor_pw}
+#g| {self.reactor_events}
+!g+-----------------------------
+#g| Propultion status // {self.propulsion}
+#g| Lightfold engines // {self.lightfold}
+#g| Propultion power // {self.propulsion_pw}
+#g| {self.prop_events}
+!g+-----------------------------
+#g| Docks // {self.docks}
+#g| Medical Bay // {self.medical}
+#g| Quarters // {self.quarters}
+#g| Baracks // {self.baracks}
+#g| {self.misc_events}
+!g+--------------------------------------------------------------------------------------
 
-+-----------------------------
-| Users connected {users}
-+--------------------------------------------------------------------------------------
+!g+-----------------------------
+#g| Users connected {users}
+!g+--------------------------------------------------------------------------------------
 """
 
 

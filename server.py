@@ -15,15 +15,14 @@ class ClientThread(threading.Thread):
     def __init__(self,clientAddress,clientsocket):
         threading.Thread.__init__(self)
         self.csocket = clientsocket
-        print ("New connection added: ", clientAddress)
+        # print ("[{}] New connection : {} ".format(time.strftime("%X"), clientAddress))
     def run(self):
         # Getting basic information, mainly name
-        print ("Connection from : ", clientAddress)
         data = self.csocket.recv(2048)
         name = data.decode()
-        print ("{} connected @ {} ".format(name,clientAddress))
+        print ("[{}] {} connected @ {} ".format(time.strftime("%X"),name,clientAddress))
         global_users.add(name)
-        print("Connected users",global_users)
+        print("[Users] : "," ".join(global_users))
         self.csocket.send(bytes(messages.handshake.format(name),'UTF-8'))
 
         while True:
@@ -35,8 +34,8 @@ class ClientThread(threading.Thread):
                     global_users.remove(name)
                 except:
                     pass
-                print (name, clientAddress , " disconnected...")
-                print ("Connected users",global_users)
+                print ("[{}] {}@{} disconnected".format(time.strftime("%X"),name, clientAddress))
+                print ("[Users] : "," ".join(global_users))
                 break
 
 
@@ -48,7 +47,7 @@ class MidiThread(threading.Thread):
         except:
             print("[ERROR] Impossible to open input {} (available are {})".format(name,mido.get_input_names()))
             exit()
-        print ("Started the midi interface")
+        print ("[INFO] Midi interface status .. Started")
 
     def run(self):
         for msg in self.interface:
@@ -59,8 +58,7 @@ server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server.bind((HOST, PORT))
 
 
-print("Server started")
-print("Waiting for client request..")
+print("[INFO] Server status .......... Started")
 
 inter=MidiThread(MIDINAME)
 inter.start()

@@ -69,61 +69,75 @@ def exit(event=None):
 
 def insertt(text,message,tag):
     try:
-        text.insert(tk.INSERT,message,tag)
+        text._tobewritten+=[(message,tag)]
+        # text.insert(tk.INSERT,message,tag)
     except:
         pass
 
+def writeall(text):
+    try:
+        for line in text._tobewritten:
+            text.insert(tk.INSERT,line[0],line[1])
+        text._tobewritten=[]
+        #Release lock
+    except:
+        text._tobewritten=[]
+
+colors={"g":"green","G":"bgreen","r":"red","R":"bred","u":"blue","U":"bblue","s":"sblue","S":"bsblue","l":"lgreen","L":"blgreen","o":'orange','O':"borange"}
+def colorform(col):
+    try:
+        return colors[col]
+    except:
+        return "default"
+
 def plain(text,msg,style="default"):
     insertt(text,msg,style)
+    insertt(text,"\n","default")
 
-def filled(text,msg1,color1,msg2,color2):
-    pass
+def filled(text,msgtotal,colortitle):
+    messaget=msgtotal.split("//")
+    msg=messaget[0].strip(" ")
+    info=messaget[1].strip(" ")
+    remaining=max(0,WIDTH-len(msg)-len(info))
+    stylet="default"
+    if len(messaget)==3:
+        style=messaget[2]
+    elif len(messaget)==2:
+        style="default"
+    insertt(text,msg,colortitle)
+    insertt(text," "+"."*remaining+" ","default")
+    insertt(text,info,style)
+    insertt(text,"\n","default")
 
-def superstyle(obj,text):
-    try:
-        if text[0]=="!":
-            return "red",text[1:]
-        elif text[0]==".":
-            return "orange",text[1:]
-        elif text[0]=="#":
-            filled(obj,text,"")
-        return "default",text
-    except:
-        return "default",text
+def superstyle(text,msg):
+    if msg[0]=="!": #Oneline colorcoded
+        plain(text,msg[2:],colorform(msg[1]))
+    # elif text[0]==".":
+    #     return "orange",text[1:]
+    elif msg[0]=="#": # Filled line
+        filled(text,msg[2:],colorform(msg[1]))
+    else:
+        plain(text,msg,"default")
 
 def receive(message_rcv,text):
+    text._tobewritten=[]
+    
+    for line in message_rcv.splitlines():
+        try:
+            superstyle(text,line)
+        except:
+            if len(line)>2:
+                line=line[2:]
+            insertt(text,line,"default")
+            insertt(text,"\n","default")
     try:
-        text.config(state=tk.NORMAL)
+        text.config(state=tk.NORMAL) #Acquire lock
         text.delete("1.0",tk.END)
+        writeall(text)
+        text.config(state=tk.DISABLED)
     except RuntimeError:
         print("Forcibly exiting...")
         exit()
-    # k=0
-    for line in message_rcv.splitlines():
-        # k+=1
-        try:
-            # text.delete("{}.0".format(k),"{}.end".format(k))#"{}.first".format(k),"{}.last".format(k))#tk.END)
-            messaget=line.split("//")
-            msg=messaget[0].strip(" ")
-            info=messaget[1].strip(" ")
-            remaining=max(0,WIDTH-len(msg)-len(info))
-            stylet="default"
-            if len(messaget)==3:
-                style=messaget[2]
-            elif len(messaget)==2:
-                style="default"
-            elif len(messaget)==4:
-                stylet=messaget[3]
-            insertt(text,msg,stylet)
-            insertt(text," "+"."*remaining+" ","default")
-            insertt(text,info,style)
-            insertt(text,"\n","default")
-        except:
-            color,line=superstyle(line)
-            insertt(text,line,color)
-            insertt(text,"\n","default")
-    text.config(state=tk.DISABLED)
-
 
 def connecting():
     return socket.socket(socket.AF_INET, socket.SOCK_STREAM)
