@@ -47,6 +47,9 @@ text.tag_config("bblue", background="blue", foreground="black")
 text.tag_config("sblue", background="black", foreground="SteelBlue")
 text.tag_config("bsblue", background="SteelBlue", foreground="black")
 
+text.tag_config("rblue", background="black", foreground="RoyalBlue4")
+text.tag_config("brblue", background="RoyalBlue4", foreground="black")
+
 text.tag_config("dgreen", background="black", foreground="dark green")
 text.tag_config("bdgreen", background="dark green", foreground="black")
 
@@ -83,7 +86,7 @@ def writeall(text):
     except:
         text._tobewritten=[]
 
-colors={"g":"green","G":"bgreen","r":"red","R":"bred","u":"blue","U":"bblue","s":"sblue","S":"bsblue","l":"lgreen","L":"blgreen","o":'orange','O':"borange"}
+colors={"g":"green","G":"bgreen","r":"red","R":"bred","u":"blue","U":"bblue","s":"sblue","S":"bsblue","l":"lgreen","L":"blgreen","o":'orange','O':"borange","y":"rblue","Y":"brblue"}
 def colorform(col):
     try:
         return colors[col]
@@ -109,18 +112,21 @@ def filled(text,msgtotal,colortitle):
     insertt(text,info,style)
     insertt(text,"\n","default")
 
-ctanks=["bred","red","borange","sblue","green","bgreen"]
+ctanks=["bred","borange","bgold","bsblue","brblue","bgreen","bred"]
 def tanks(text,msgtotal,colortitle):
     tankt=msgtotal.split("//") # Split all tank
-    size=10
-    f="{:^13}" # +3 because of the len("+=+")
+    size=4
+    f="{:^7}" # +3 because of the len("+=+")
     #f="{:^"+str(size+3)+"}"
     tanks,nb=[],0
     for tank in tankt: # Split label:value
-        label,pct=tank.split(":")
-        pct=int(int(pct)*4/126)
-        col=ctanks[pct]
-        tanks+=[(label,pct,col)]
+        label,rpct,colt=tank.split(":")
+        pct=int(int(rpct)*5/100)
+        try:
+            col=ctanks[pct]
+        except:
+            col="bred"
+        tanks+=[(label,pct,col,rpct,colt)]
         #size=max(size,len(label))
         nb+=1
 
@@ -130,9 +136,9 @@ def tanks(text,msgtotal,colortitle):
     insertt(text,sepline,colortitle)
     for line in range(5): #build all tanks line by line
         for tank in tanks:
-            if tank[1]>line:
+            if tank[1]>4-line:
                 insertt(text,pad+'|',colortitle)
-                insertt(text,'#',tank[2])
+                insertt(text,'#',tank[4])#tank[2])
                 insertt(text,'|'+pad,colortitle)
             else:
                 insertt(text,pad+'| |'+pad,colortitle)
@@ -140,6 +146,9 @@ def tanks(text,msgtotal,colortitle):
     insertt(text,sepline,colortitle)
     for tank in tanks:
         insertt(text,f.format(tank[0][:size+3]),tank[2])
+    insertt(text,"\n",colortitle)
+    for tank in tanks:
+        insertt(text,f.format(tank[3]+"%"),tank[2])
     insertt(text,"\n",colortitle)
 
 def superstyle(text,msg):

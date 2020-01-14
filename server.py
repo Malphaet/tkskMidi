@@ -15,7 +15,6 @@ class ClientThread(threading.Thread):
     def __init__(self,clientAddress,clientsocket):
         threading.Thread.__init__(self)
         self.csocket = clientsocket
-        # print ("[{}] New connection : {} ".format(time.strftime("%X"), clientAddress))
     def run(self):
         # Getting basic information, mainly name
         data = self.csocket.recv(2048)
@@ -51,6 +50,7 @@ class MidiThread(threading.Thread):
 
     def run(self):
         for msg in self.interface:
+            #print(msg) # For debug purposes
             global_status.updateMessage(msg)
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

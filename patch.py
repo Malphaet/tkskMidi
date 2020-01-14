@@ -26,6 +26,7 @@ base="""!g+---------------------------------------------------------------------
 #g| {self.misc_events2}
 !g+--------------------------------------------------------------------------------------
 
+!g    Oxygen tanks       Accumulator Arrays                  Shielding
 @g {self.tanks}
 
 !g+-----------------------------
@@ -36,7 +37,7 @@ base="""!g+---------------------------------------------------------------------
 
 class messageStat():
     def __init__(self):
-        self.cc=self.genall([16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,61,62],-1)
+        self.cc=self.genall([16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62],-1)
         self.note=self.genall([1,3, 4,6, 7,9, 10,12, 13,15, 16,18,19,21,22,24],0)
         # self.off=self.genempty([44])
         empty=lambda : ""
@@ -80,8 +81,11 @@ class messageStat():
         return "[{:>2}%]//bred".format(pct)
 
     def tanks_ev(self):
-        return "Oxygen 1:{} // Oxygen 2:{} // Accumulator:{}".format(self.cc[54],self.cc[55],self.cc[56])
-
+        return "Oxy1:{}:bsblue // Oxy2:{}:bsblue // Oxy3:{}:bsblue // Acc1:{}:bgold // Acc2:{}:bgold // Acc3:{}:bgold // Top:{}:brblue // Bot:{}:brblue //Sta:{}:brblue // Port:{}:brblue //Fore:{}:brblue//Stern:{}:brblue".format(
+        self.cc[54],self.cc[55],self.cc[56], # Oxy
+        self.cc[58],self.cc[59],self.cc[60], # Acc
+        self.cc[19],self.cc[23],self.cc[27],self.cc[31],self.cc[49],self.cc[53]) # Shielding
+        #// Top:{} // Bot:{} //Sta:{} Port:{} //Fore:{}//Stern:{}
     def main_ev(self):
         ret=""
         if self.note[1]:
