@@ -22,8 +22,11 @@ base="""!g+---------------------------------------------------------------------
 #g| Medical Bay // {self.medical}
 #g| Quarters // {self.quarters}
 #g| Baracks // {self.baracks}
-#g| {self.misc_events}
+#g| {self.misc_events1}
+#g| {self.misc_events2}
 !g+--------------------------------------------------------------------------------------
+
+@g {self.tanks}
 
 !g+-----------------------------
 #g| Users connected {users}
@@ -76,6 +79,9 @@ class messageStat():
             return "[{:>2}%]//red".format(pct)
         return "[{:>2}%]//bred".format(pct)
 
+    def tanks_ev(self):
+        return "Oxygen 1:{} // Oxygen 2:{} // Accumulator:{}".format(self.cc[54],self.cc[55],self.cc[56])
+
     def main_ev(self):
         ret=""
         if self.note[1]:
@@ -122,17 +128,22 @@ class messageStat():
             ret="Critical Issue//"+ret+"//bred"
         return ret
 
-    def misc_ev(self):
+    def misc_ev1(self):
         ret=""
         if self.note[13]:
             ret+="Electrical Fire ! "
         if self.note[15]:
             ret+="Hull breach ! "
+        if ret != "":
+            ret="Critical Issue//"+ret+"//bred"
+        return ret
+
+    def misc_ev2(self):
+        ret=""
         if self.note[16]:
             ret+="Structural integrity critical ! "
         if self.note[18]:
             ret+="Foreign object alert !"
-
         if ret != "":
             ret="Critical Issue//"+ret+"//bred"
         return ret
@@ -160,8 +171,10 @@ class messageStat():
         self.vital_events=self.vital_ev()
         self.reactor_events=self.reactor_ev()
         self.prop_events=self.prop_ev()
-        self.misc_events=self.misc_ev()
+        self.misc_events1=self.misc_ev1()
+        self.misc_events2=self.misc_ev2()
 
+        self.tanks=self.tanks_ev()
     def genall(self,t,val):
         content={}
         for nb in t:

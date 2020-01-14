@@ -109,11 +109,44 @@ def filled(text,msgtotal,colortitle):
     insertt(text,info,style)
     insertt(text,"\n","default")
 
+ctanks=["bred","red","borange","sblue","green","bgreen"]
+def tanks(text,msgtotal,colortitle):
+    tankt=msgtotal.split("//") # Split all tank
+    size=10
+    f="{:^13}" # +3 because of the len("+=+")
+    #f="{:^"+str(size+3)+"}"
+    tanks,nb=[],0
+    for tank in tankt: # Split label:value
+        label,pct=tank.split(":")
+        pct=int(int(pct)*4/126)
+        col=ctanks[pct]
+        tanks+=[(label,pct,col)]
+        #size=max(size,len(label))
+        nb+=1
+
+    #Building all tanks
+    pad=" "*int(size/2)
+    sepline=(pad+"+=+"+pad)*nb+"\n"
+    insertt(text,sepline,colortitle)
+    for line in range(5): #build all tanks line by line
+        for tank in tanks:
+            if tank[1]>line:
+                insertt(text,pad+'|',colortitle)
+                insertt(text,'#',tank[2])
+                insertt(text,'|'+pad,colortitle)
+            else:
+                insertt(text,pad+'| |'+pad,colortitle)
+        insertt(text,"\n",colortitle)
+    insertt(text,sepline,colortitle)
+    for tank in tanks:
+        insertt(text,f.format(tank[0][:size+3]),tank[2])
+    insertt(text,"\n",colortitle)
+
 def superstyle(text,msg):
     if msg[0]=="!": #Oneline colorcoded
         plain(text,msg[2:],colorform(msg[1]))
-    # elif text[0]==".":
-    #     return "orange",text[1:]
+    elif msg[0]=="@":
+        tanks(text,msg[2:],colorform(msg[1]))
     elif msg[0]=="#": # Filled line
         filled(text,msg[2:],colorform(msg[1]))
     else:
@@ -121,7 +154,7 @@ def superstyle(text,msg):
 
 def receive(message_rcv,text):
     text._tobewritten=[]
-    
+
     for line in message_rcv.splitlines():
         try:
             superstyle(text,line)

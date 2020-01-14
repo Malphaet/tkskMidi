@@ -44,7 +44,7 @@ connection_error="""#g Communication error // Connection refused // red
 
 
 
-#g Try number // {tnumber} // borange
+#G Try number // {tnumber} // borange
 
 #g Satus // Fatal // bred
 #g Quality // Worst // bred"""
@@ -57,6 +57,6 @@ connection_terminated="""#g                    Connection terminated
 
 retrying_connection="""#g Checking all systems // Warning //borange
 
-#G Connection // Retrying connection // orange
+#g Connection // Retrying connection // orange
 
 #g Quality // Bad // orange"""
