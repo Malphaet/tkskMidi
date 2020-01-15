@@ -2,11 +2,12 @@
 import threading,socket,time
 import patch,messages
 import mido
+import config
 
 SLEEP_SCHEDULER=1
-HOST = "localhost"
-PORT = 12345
-MIDINAME='Midi Through Port-0'
+HOST = config.SERVERNAME
+PORT = config.SERVERPORT
+MIDINAME=config.MIDINAME
 
 global_users={}
 global_status=patch.messageStat()
@@ -62,7 +63,7 @@ class MidiThread(threading.Thread):
 
     def run(self):
         for msg in self.interface:
-            #print(msg) # For debug purposes
+            # print(msg) # For debug purposes
             global_status.updateMessage(msg)
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

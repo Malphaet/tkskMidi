@@ -1,5 +1,8 @@
-MIDINAMEIN="RtMidi input"
+MIDINAMEIN='Virtual Port 2'
 import mido,sys
+
+import time
+import rtmidi
 
 try:
     interface=mido.open_output(MIDINAMEIN)
@@ -49,15 +52,19 @@ def loop():
 
 if __name__ == '__main__':
     if(len(sys.argv)>1):
-        if sys.argv[1]=="auto":
-            print(sys.argv)
-            import time
-            from random import randint
-            for i in range(20):
-                for m in cc_test:
-                    cmd="cc {} {}".format(m,i*6+randint(0,7))
-                    # print(cmd[:-2])
-                    parsemsg(cmd)
-                time.sleep(1)
+        if sys.argv[1]in("interactive","i"):
+            loop()
     else:
-        loop()
+        import time
+        from random import randint
+        print("Sending all notes")
+        for i in range(4):
+            for m in note_test:
+                parsemsg("note {}".format(m))
+            time.sleep(2)
+        print("Sending all control_change")
+        for i in range(22):
+            for m in cc_test:
+                cmd="cc {} {}".format(m,min(i*6+randint(1,7),127))
+                parsemsg(cmd)
+            time.sleep(1)
