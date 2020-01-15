@@ -1,27 +1,34 @@
 #!/bin/python3
-import threading,socket,time
+import threading,socket,time,hashlib
 import patch,messages
 import mido
 import config
 
-SLEEP_SCHEDULER=1
+SLEEP_SCHEDULER=config.SLEEP_SCHEDULER
 HOST = config.SERVERNAME
 PORT = config.SERVERPORT
 MIDINAME=config.MIDINAME
 
 global_users={}
 global_status=patch.messageStat()
+# writelock=threading.Lock()
+
+def showusers():
+    ret=""
+    for user in global_users:
+        if global_users[user]>0:
+            ret+=" "+user
+    return ret
 
 class ClientThread(threading.Thread):
     def __init__(self,clientAddress,clientsocket):
         threading.Thread.__init__(self)
         self.csocket = clientsocket
-    def showusers(self):
-        ret=""
-        for user in global_users:
-            if global_users[user]>0:
-                ret+=" "+user
-        return ret
+
+    def send(self,msg):
+        # msg=msg.encode('UTF-8')
+        # msg=self.hashit(msg)+msg # It is grossly inneficient to do it that way, hash should be prerendered with a _hash attribute
+        self.csocket.send(bytes(msg,'UTF-8'))
 
     def run(self):
         # Getting basic information, mainly name
@@ -32,14 +39,15 @@ class ClientThread(threading.Thread):
             global_users[name]+=1
         except:
             global_users[name]=1
-        print("[Users] : ",self.showusers())
-        self.csocket.send(bytes(messages.handshake.format(name),'UTF-8'))
-
+        print("[Users] : ",showusers())
+        global_status.updadeMessage(showusers())
+        self.send(messages.handshake.format(name))
+        time.sleep(0.2)
         while True:
             try:
+                self.send(global_status.message())
                 time.sleep(SLEEP_SCHEDULER)
-                self.csocket.send(bytes(str(global_status.generateMessage(self.showusers())),'UTF-8'))
-            except ConnectionResetError:
+            except (ConnectionResetError,ConnectionAbortedError):
                 try:
                     global_users[name]-=1
                     if global_users[name]<0:
@@ -47,7 +55,8 @@ class ClientThread(threading.Thread):
                 except:
                     pass
                 print ("[{}] {}@{} disconnected".format(time.strftime("%X"),name, clientAddress))
-                print ("[Users] : ",self.showusers())
+                print ("[Users] : ",showusers())
+                global_status.updadeMessage(showusers())
                 break
 
 
@@ -65,6 +74,7 @@ class MidiThread(threading.Thread):
         for msg in self.interface:
             # print(msg) # For debug purposes
             global_status.updateMessage(msg)
+            global_status.updadeMessage(showusers())
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

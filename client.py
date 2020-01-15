@@ -19,6 +19,8 @@ WIDTH=config.WIDTH
 WINDOWSIZE=config.WINDOWSIZE
 HOST,PORT=config.HOST,config.PORT
 NAME=config.NAME
+REFRESHINTERVAL=config.REFRESHINTERVAL
+
 ####################
 # Quick and dirty code
 root = tk.Tk()
@@ -76,21 +78,24 @@ def insertt(text,message,tag):
         # text.insert(tk.INSERT,message,tag)
     except:
         print(criticalTraceback())#tpass
+        exit()
 
 def writeall(text):
     try:
+        start_time = time.time()
+        text.delete("1.0",tk.END)
         for line in text._tobewritten:
             text.insert(tk.INSERT,line[0],line[1])
+        # print(" Written {} lines in {} seconds".format(len(text._tobewritten),time.time()-start_time))
         text._tobewritten=[]
-        #Release lock
-    except:
+    except ValueError:
         text._tobewritten=[]
 
 colors={"g":"green","G":"bgreen","r":"red","R":"bred","u":"blue","U":"bblue","s":"sblue","S":"bsblue","l":"lgreen","L":"blgreen","o":'orange','O':"borange","y":"rblue","Y":"brblue"}
 def colorform(col):
     try:
         return colors[col]
-    except:
+    except IndexError:
         return "default"
 
 def plain(text,msg,style="default"):
@@ -124,7 +129,7 @@ def tanks(text,msgtotal,colortitle):
         pct=int(int(rpct)*5/100)
         try:
             col=ctanks[pct]
-        except:
+        except ValueError:
             col="bred"
         tanks+=[(label,pct,col,rpct,colt,coll)]
         #size=max(size,len(label))
@@ -132,8 +137,9 @@ def tanks(text,msgtotal,colortitle):
 
     #Building all tanks
     pad=" "*int(size/2)
-    sepline=(pad+"+=+"+pad)*nb+"\n"
+    sepline=(pad+"+=+"+pad)*nb
     insertt(text,sepline,colortitle)
+    insertt(text,"\n",colortitle)
     for line in range(5): #build all tanks line by line
         for tank in tanks:
             if tank[1]>4-line:
@@ -143,7 +149,8 @@ def tanks(text,msgtotal,colortitle):
             else:
                 insertt(text,pad+'| |'+pad,colortitle)
         insertt(text,"\n",colortitle)
-    insertt(text,sepline,colortitle)
+    insertt(text,sepline+"\n",colortitle)
+    # insertt(text,"\n",colortitle)
     for tank in tanks:
         insertt(text,f.format(tank[0][:size+3]),tank[5])
     insertt(text,"\n",colortitle)
@@ -163,18 +170,16 @@ def superstyle(text,msg):
 
 def receive(message_rcv,text):
     text._tobewritten=[]
-
     for line in message_rcv.splitlines():
         try:
             superstyle(text,line)
-        except:
+        except (IndexError,ValueError): # Second is for split on tanks, custom error is likely better
             if len(line)>2:
                 line=line[2:]
             insertt(text,line,"default")
             insertt(text,"\n","default")
     try:
         text.config(state=tk.NORMAL) #Acquire lock
-        text.delete("1.0",tk.END)
         writeall(text)
         text.config(state=tk.DISABLED)
     except RuntimeError:
@@ -187,6 +192,8 @@ def connecting():
 def criticalTraceback():
     exc,funct,tb=sys.exc_info()
     code=tb.tb_frame.f_code
+    for l in tb:
+        print(l)
     return("[Critical error] {} line {} ({}@{})".format(exc.__name__,code.co_firstlineno,code.co_name,code.co_filename))
 
 def threadclient():
@@ -203,17 +210,20 @@ def threadclient():
             time.sleep(2)
             continue
         receive(messages.connected,text)
+        time.sleep(2)
         try:
             s.send(bytes("{}".format(NAME),'UTF-8'))
         except (BrokenPipeError,OSError):
             receive(messages.handshake_error,text)
-            time.sleep(3)
+            time.sleep(2)
             continue#exit()
 
         while 1:
             try:
                 data=s.recv(2048)
                 if data!=0:
+                    msg=str(data.decode('UTF-8'))
+                    # chk,msg=msg[:6],msg[6:]
                     receive(str(data.decode('UTF-8')),text)
                 else:
                     break
@@ -224,7 +234,6 @@ def threadclient():
                 tryouts=0
                 break
             except Exception as e:
-                # print("Unknown error",e)
                 print(criticalTraceback())
 ################
 # SYSTEM MESSAGE

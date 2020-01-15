@@ -43,6 +43,7 @@ class messageStat():
         empty=lambda : ""
         align=11
         self.update()
+        self._message=""
 
     def pct(self,val):
         return int(val*100/127)
@@ -187,9 +188,15 @@ class messageStat():
 
 
 
-    def generateMessage(self,users=""):
-        return base.format(title="I.S.F Esperance : Dashboard", self=self ,users=users)
+    def message(self):
+        return self._message
+    def __str__(self):
+        return self._message
 
+    def updadeMessage(self,users=""):
+        self._message=base.format(title="I.S.F Esperance : Dashboard", self=self ,users=users)
+        return self._message
+        
     def updateMessage(self,message):
         # print(message)
         if message.type=="control_change":
@@ -210,8 +217,5 @@ class messageStat():
             print("off")
         self.update()
 
-    def __str__(self):
-        return self.generateMessage()
-
 if __name__ == '__main__':
-    print(messageStat().generateMessage("test"))
+    print(messageStat().updadeMessage("test"))
