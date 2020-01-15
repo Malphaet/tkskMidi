@@ -81,7 +81,7 @@ class messageStat():
         return "[{:>2}%]//bred".format(pct)
 
     def tanks_ev(self):
-        return "Oxy1:{}:bsblue // Oxy2:{}:bsblue // Oxy3:{}:bsblue // Acc1:{}:bgold // Acc2:{}:bgold // Acc3:{}:bgold // Top:{}:brblue // Bot:{}:brblue //Sta:{}:brblue // Port:{}:brblue //Fore:{}:brblue//Stern:{}:brblue".format(
+        return "Oxy1:{}:bsblue:sblue // Oxy2:{}:bsblue:sblue // Oxy3:{}:bsblue:sblue // Acc1:{}:bgold:gold // Acc2:{}:bgold:gold // Acc3:{}:bgold:gold // Top:{}:brblue:rblue // Bot:{}:brblue:rblue //Port:{}:brblue:rblue // Star:{}:brblue:rblue //Fore:{}:brblue:rblue//Stern:{}:brblue:rblue".format(
         self.cc[54],self.cc[55],self.cc[56], # Oxy
         self.cc[58],self.cc[59],self.cc[60], # Acc
         self.cc[19],self.cc[23],self.cc[27],self.cc[31],self.cc[49],self.cc[53]) # Shielding

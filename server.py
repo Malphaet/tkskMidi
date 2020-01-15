@@ -4,37 +4,49 @@ import patch,messages
 import mido
 
 SLEEP_SCHEDULER=1
-HOST = "192.168.1.13"
+HOST = "localhost"
 PORT = 12345
-MIDINAME='MIDI Mix 0'
+MIDINAME='Midi Through Port-0'
 
-global_users=set()
+global_users={}
 global_status=patch.messageStat()
 
 class ClientThread(threading.Thread):
     def __init__(self,clientAddress,clientsocket):
         threading.Thread.__init__(self)
         self.csocket = clientsocket
+    def showusers(self):
+        ret=""
+        for user in global_users:
+            if global_users[user]>0:
+                ret+=" "+user
+        return ret
+
     def run(self):
         # Getting basic information, mainly name
         data = self.csocket.recv(2048)
         name = data.decode()
         print ("[{}] {} connected @ {} ".format(time.strftime("%X"),name,clientAddress))
-        global_users.add(name)
-        print("[Users] : "," ".join(global_users))
+        try:
+            global_users[name]+=1
+        except:
+            global_users[name]=1
+        print("[Users] : ",self.showusers())
         self.csocket.send(bytes(messages.handshake.format(name),'UTF-8'))
 
         while True:
             try:
                 time.sleep(SLEEP_SCHEDULER)
-                self.csocket.send(bytes(str(global_status.generateMessage(global_users)),'UTF-8'))
+                self.csocket.send(bytes(str(global_status.generateMessage(self.showusers())),'UTF-8'))
             except ConnectionResetError:
                 try:
-                    global_users.remove(name)
+                    global_users[name]-=1
+                    if global_users[name]<0:
+                        global_users[name]=0 # Could also drop entry
                 except:
                     pass
                 print ("[{}] {}@{} disconnected".format(time.strftime("%X"),name, clientAddress))
-                print ("[Users] : "," ".join(global_users))
+                print ("[Users] : ",self.showusers())
                 break
 
 

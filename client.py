@@ -8,7 +8,7 @@ except:
     from Tkinter import font
     import Tkinter as tk
 # from _thread import *
-import threading,socket,time
+import threading,socket,time,sys
 import config
 
 #################
@@ -75,7 +75,7 @@ def insertt(text,message,tag):
         text._tobewritten+=[(message,tag)]
         # text.insert(tk.INSERT,message,tag)
     except:
-        pass
+        print(criticalTraceback())#tpass
 
 def writeall(text):
     try:
@@ -120,13 +120,13 @@ def tanks(text,msgtotal,colortitle):
     #f="{:^"+str(size+3)+"}"
     tanks,nb=[],0
     for tank in tankt: # Split label:value
-        label,rpct,colt=tank.split(":")
+        label,rpct,colt,coll=tank.split(":")
         pct=int(int(rpct)*5/100)
         try:
             col=ctanks[pct]
         except:
             col="bred"
-        tanks+=[(label,pct,col,rpct,colt)]
+        tanks+=[(label,pct,col,rpct,colt,coll)]
         #size=max(size,len(label))
         nb+=1
 
@@ -145,7 +145,7 @@ def tanks(text,msgtotal,colortitle):
         insertt(text,"\n",colortitle)
     insertt(text,sepline,colortitle)
     for tank in tanks:
-        insertt(text,f.format(tank[0][:size+3]),tank[2])
+        insertt(text,f.format(tank[0][:size+3]),tank[5])
     insertt(text,"\n",colortitle)
     for tank in tanks:
         insertt(text,f.format(tank[3]+"%"),tank[2])
@@ -184,6 +184,11 @@ def receive(message_rcv,text):
 def connecting():
     return socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+def criticalTraceback():
+    exc,funct,tb=sys.exc_info()
+    code=tb.tb_frame.f_code
+    return("[Critical error] {} line {} ({}@{})".format(exc.__name__,code.co_firstlineno,code.co_name,code.co_filename))
+
 def threadclient():
     receive(messages.opening_text0,text)
     tryouts=0
@@ -218,6 +223,9 @@ def threadclient():
                 receive(messages.retrying_connection,text)
                 tryouts=0
                 break
+            except Exception as e:
+                # print("Unknown error",e)
+                print(criticalTraceback())
 ################
 # SYSTEM MESSAGE
 
