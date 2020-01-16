@@ -16,6 +16,7 @@ import config
 FONT=config.FONT #"NovaMono"#'Speculum'
 FONTSIZE=config.FONTSIZE
 WIDTH=config.WIDTH
+HEIGHT=config.HEIGHT
 WINDOWSIZE=config.WINDOWSIZE
 HOST,PORT=config.HOST,config.PORT
 NAME=config.NAME
@@ -34,7 +35,7 @@ main = font.Font(family=FONT, size=FONTSIZE)
 
 font.families()
 
-text = tk.Text(root,bg="black",font=main,padx=12,pady=12,cursor="cross")
+text = tk.Text(root,bg="black",font=main,padx=12,pady=12,cursor="cross",exportselection=0)
 text.tag_config("default", background="black", foreground="green")
 
 text.tag_config("bred", background="red", foreground="black")
@@ -69,6 +70,12 @@ text.tag_config("title", background="black", foreground="green")#,font=mainbold)
 
 text.pack(fill=tk.BOTH,expand=1)
 
+def newtext(text,lines):
+    text.delete("1.0",tk.END)
+    for l in range(lines):
+        text.insert(tk.INSERT,"\n")
+newtext(text,HEIGHT)
+
 def exit(event=None):
     quit()
 
@@ -80,12 +87,29 @@ def insertt(text,message,tag):
         print(criticalTraceback())#tpass
         exit()
 
+def newline(text): # Prolly smarter implementation could be done
+    pass
+
 def writeall(text):
     try:
         start_time = time.time()
-        text.delete("1.0",tk.END)
+        # text.delete("1.0",tk.END)
+        text.delete("1.0","1.end")
+        text.mark_set(tk.INSERT,"1.0")
+        l=1
+        # time.sleep(1)
+
         for line in text._tobewritten:
-            text.insert(tk.INSERT,line[0],line[1])
+            # if line=="\n":
+            #     l+=1
+            if line[0]==0:
+                # print("Deleting")
+                l+=1
+                text.mark_set(tk.INSERT,str(l)+".0")
+                text.delete(tk.INSERT,"insert lineend")
+                # time.sleep(0.025)
+            else:
+                text.insert(tk.INSERT,line[0],line[1])
         # print(" Written {} lines in {} seconds".format(len(text._tobewritten),time.time()-start_time))
         text._tobewritten=[]
     except ValueError:
@@ -100,7 +124,7 @@ def colorform(col):
 
 def plain(text,msg,style="default"):
     insertt(text,msg,style)
-    insertt(text,"\n","default")
+    insertt(text,0,"default")
 
 def filled(text,msgtotal,colortitle):
     messaget=msgtotal.split("//")
@@ -115,7 +139,7 @@ def filled(text,msgtotal,colortitle):
     insertt(text,msg,colortitle)
     insertt(text," "+"."*remaining+" ","default")
     insertt(text,info,style)
-    insertt(text,"\n","default")
+    insertt(text,0,"default")
 
 ctanks=["bred","borange","bgold","bsblue","brblue","bgreen","bred"]
 def tanks(text,msgtotal,colortitle):
@@ -139,7 +163,7 @@ def tanks(text,msgtotal,colortitle):
     pad=" "*int(size/2)
     sepline=(pad+"+=+"+pad)*nb
     insertt(text,sepline,colortitle)
-    insertt(text,"\n",colortitle)
+    insertt(text,0,colortitle)
     for line in range(5): #build all tanks line by line
         for tank in tanks:
             if tank[1]>4-line:
@@ -148,15 +172,15 @@ def tanks(text,msgtotal,colortitle):
                 insertt(text,'|'+pad,colortitle)
             else:
                 insertt(text,pad+'| |'+pad,colortitle)
-        insertt(text,"\n",colortitle)
-    insertt(text,sepline+"\n",colortitle)
-    # insertt(text,"\n",colortitle)
+        insertt(text,0,colortitle)
+    insertt(text,sepline,colortitle)
+    insertt(text,0,colortitle)
     for tank in tanks:
         insertt(text,f.format(tank[0][:size+3]),tank[5])
-    insertt(text,"\n",colortitle)
+    insertt(text,0,colortitle)
     for tank in tanks:
         insertt(text,f.format(tank[3]+"%"),tank[2])
-    insertt(text,"\n",colortitle)
+    insertt(text,0,colortitle)
 
 def superstyle(text,msg):
     if msg[0]=="!": #Oneline colorcoded
@@ -177,7 +201,7 @@ def receive(message_rcv,text):
             if len(line)>2:
                 line=line[2:]
             insertt(text,line,"default")
-            insertt(text,"\n","default")
+            insertt(text,0,"default")
     try:
         text.config(state=tk.NORMAL) #Acquire lock
         writeall(text)
@@ -192,8 +216,10 @@ def connecting():
 def criticalTraceback():
     exc,funct,tb=sys.exc_info()
     code=tb.tb_frame.f_code
-    for l in tb:
-        print(l)
+    # traceback.print_exception(exc,funct,tb)
+    print(traceback.format_exc())
+    print("---")
+    traceback.print_exc()
     return("[Critical error] {} line {} ({}@{})".format(exc.__name__,code.co_firstlineno,code.co_name,code.co_filename))
 
 def threadclient():
