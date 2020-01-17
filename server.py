@@ -1,5 +1,5 @@
 #!/bin/python3
-import threading,socket,time,hashlib
+import threading,socket,time
 import patch,messages
 import mido
 import config
@@ -27,7 +27,6 @@ class ClientThread(threading.Thread):
 
     def send(self,msg):
         # msg=msg.encode('UTF-8')
-        # msg=self.hashit(msg)+msg # It is grossly inneficient to do it that way, hash should be prerendered with a _hash attribute
         self.csocket.send(bytes(msg,'UTF-8'))
 
     def run(self):
@@ -41,11 +40,11 @@ class ClientThread(threading.Thread):
             global_users[name]=1
         print("[Users] : ",showusers())
         global_status.updadeMessage(showusers())
-        self.send(messages.handshake.format(name))
+        self.send(patch.encodehash(messages.handshake.format(name)))
         time.sleep(0.2)
         while True:
             try:
-                self.send(global_status.message())
+                self.send(global_status.hmessage())
                 time.sleep(SLEEP_SCHEDULER)
             except (ConnectionResetError,ConnectionAbortedError):
                 try:

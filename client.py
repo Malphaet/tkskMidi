@@ -8,9 +8,9 @@ except:
     from Tkinter import font
     import Tkinter as tk
 # from _thread import *
-import threading,socket,time,sys
+import threading,socket,time,sys,traceback
 import config
-
+from patch import decodehash
 #################
 # IMPORTANT INFO
 FONT=config.FONT #"NovaMono"#'Speculum'
@@ -27,8 +27,6 @@ REFRESHINTERVAL=config.REFRESHINTERVAL
 root = tk.Tk()
 root.title("Centauri Remote Viewer 1.0")
 root.geometry(WINDOWSIZE)
-root.bind('<Control-q>', exit)
-root.bind('<Control-c>', exit)
 
 main = font.Font(family=FONT, size=FONTSIZE)
 # mainbold=font.Font(family=FONT, size=FONTSIZE, weight="bold")
@@ -67,7 +65,6 @@ text.tag_config("borange", background="orange", foreground="black")
 
 text.tag_config("title", background="black", foreground="green")#,font=mainbold)
 
-
 text.pack(fill=tk.BOTH,expand=1)
 
 def newtext(text,lines):
@@ -87,23 +84,15 @@ def insertt(text,message,tag):
         print(criticalTraceback())#tpass
         exit()
 
-def newline(text): # Prolly smarter implementation could be done
-    pass
-
 def writeall(text):
     try:
         start_time = time.time()
-        # text.delete("1.0",tk.END)
         text.delete("1.0","1.end")
         text.mark_set(tk.INSERT,"1.0")
         l=1
-        # time.sleep(1)
 
         for line in text._tobewritten:
-            # if line=="\n":
-            #     l+=1
             if line[0]==0:
-                # print("Deleting")
                 l+=1
                 text.mark_set(tk.INSERT,str(l)+".0")
                 text.delete(tk.INSERT,"insert lineend")
@@ -113,6 +102,7 @@ def writeall(text):
         # print(" Written {} lines in {} seconds".format(len(text._tobewritten),time.time()-start_time))
         text._tobewritten=[]
     except ValueError:
+        print(trackme())
         text._tobewritten=[]
 
 colors={"g":"green","G":"bgreen","r":"red","R":"bred","u":"blue","U":"bblue","s":"sblue","S":"bsblue","l":"lgreen","L":"blgreen","o":'orange','O':"borange","y":"rblue","Y":"brblue"}
@@ -120,6 +110,7 @@ def colorform(col):
     try:
         return colors[col]
     except IndexError:
+        print(trackme())
         return "default"
 
 def plain(text,msg,style="default"):
@@ -154,6 +145,7 @@ def tanks(text,msgtotal,colortitle):
         try:
             col=ctanks[pct]
         except ValueError:
+            print(trackme())
             col="bred"
         tanks+=[(label,pct,col,rpct,colt,coll)]
         #size=max(size,len(label))
@@ -198,6 +190,7 @@ def receive(message_rcv,text):
         try:
             superstyle(text,line)
         except (IndexError,ValueError): # Second is for split on tanks, custom error is likely better
+            # print(trackme())
             if len(line)>2:
                 line=line[2:]
             insertt(text,line,"default")
@@ -222,9 +215,15 @@ def criticalTraceback():
     traceback.print_exc()
     return("[Critical error] {} line {} ({}@{})".format(exc.__name__,code.co_firstlineno,code.co_name,code.co_filename))
 
+def trackme():
+    import inspect
+    print(inspect.currentframe().f_back)
+
 def threadclient():
+    global s
     receive(messages.opening_text0,text)
     tryouts=0
+    oldhash=""
     while 1: # Main connection loop
         time.sleep(1)
         s=connecting()
@@ -247,19 +246,28 @@ def threadclient():
         while 1:
             try:
                 data=s.recv(2048)
+                newhash,data=decodehash(data)
+                if newhash==oldhash:
+                    continue
+                oldhash=newhash
                 if data!=0:
                     msg=str(data.decode('UTF-8'))
                     # chk,msg=msg[:6],msg[6:]
                     receive(str(data.decode('UTF-8')),text)
                 else:
                     break
+                time.sleep(0.01)
             except ConnectionResetError:
+                trackme()
                 s.close()
                 receive(messages.connection_terminated,text)
                 receive(messages.retrying_connection,text)
                 tryouts=0
                 break
+            except OSError:
+                exit()
             except Exception as e:
+                print(trackme())
                 print(criticalTraceback())
 ################
 # SYSTEM MESSAGE
@@ -267,7 +275,19 @@ def threadclient():
 import messages
 
 if __name__ == '__main__':
+    s=None
     thread=threading.Thread(target=threadclient,args=())
     thread.start()
+    def on_closing(*args):
+        root.destroy()
+        try:
+            s.close()
+            thread.join()
+        except:
+            pass
+        exit()
+    root.protocol("WM_DELETE_WINDOW", on_closing)
+    root.bind('<Control-q>', on_closing)
+    root.bind('<Control-c>', on_closing)
     root.mainloop()
     exit()

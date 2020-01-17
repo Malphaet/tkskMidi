@@ -34,6 +34,25 @@ base="""!g+---------------------------------------------------------------------
 !g+--------------------------------------------------------------------------------------
 """
 
+import hashlib
+
+def hashmsg(text):
+    "Return a :6 hex hash"
+    h = hashlib.md5(text.encode("utf-8"))
+    return(h.hexdigest()[:7])
+
+
+def check(text,md5):
+    "Check message integrity"
+    return md5==hashmsg(text)
+
+def decodehash(text):
+    "Return hash, msg"
+    return text[:7],text[7:]
+
+def encodehash(text):
+    "Return hash+msg"
+    return hashmsg(text)+text
 
 class messageStat():
     def __init__(self):
@@ -44,6 +63,7 @@ class messageStat():
         align=11
         self.update()
         self._message=""
+        self._hash=hashmsg(self._message)
 
     def pct(self,val):
         return int(val*100/127)
@@ -186,8 +206,8 @@ class messageStat():
             content[nb]=val
         return content
 
-
-
+    def hmessage(self):
+        return self._hmessage
     def message(self):
         return self._message
     def __str__(self):
@@ -195,8 +215,10 @@ class messageStat():
 
     def updadeMessage(self,users=""):
         self._message=base.format(title="I.S.F Esperance : Dashboard", self=self ,users=users)
+        self._hash=hashmsg(self._message)
+        self._hmessage=self._hash+self._message
         return self._message
-        
+
     def updateMessage(self,message):
         # print(message)
         if message.type=="control_change":
@@ -213,8 +235,8 @@ class messageStat():
                 # print (self.note)
             except:
                 pass
-        elif message.type=="note_on":
-            print("off")
+        # elif message.type=="note_off":
+        #     print("off")
         self.update()
 
 if __name__ == '__main__':
