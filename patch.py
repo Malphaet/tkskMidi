@@ -26,7 +26,7 @@ base="""!g+---------------------------------------------------------------------
 #g| {self.misc_events2}
 !g+--------------------------------------------------------------------------------------
 
-!g    Oxygen tanks       Accumulator Arrays                  Shielding
+!g    Oxygen tanks       Accumulator Arrays
 @g {self.tanks}
 
 !g+-----------------------------
@@ -102,11 +102,14 @@ class messageStat():
         return "[{:>2}%]//bred".format(pct)
 
     def tanks_ev(self):
-        return "Oxy1:{}:bsblue:sblue // Oxy2:{}:bsblue:sblue // Oxy3:{}:bsblue:sblue // Acc1:{}:bgold:gold // Acc2:{}:bgold:gold // Acc3:{}:bgold:gold // Top:{}:brblue:rblue // Bot:{}:brblue:rblue //Port:{}:brblue:rblue // Star:{}:brblue:rblue //Fore:{}:brblue:rblue//Stern:{}:brblue:rblue".format(
+        return "Oxy1:{}:bsblue:sblue // Oxy2:{}:bsblue:sblue // Oxy3:{}:bsblue:sblue // Acc1:{}:bgold:gold // Acc2:{}:bgold:gold // Acc3:{}:bgold:gold".format(
         self.cc[54],self.cc[55],self.cc[56], # Oxy
-        self.cc[58],self.cc[59],self.cc[60], # Acc
-        self.cc[19],self.cc[23],self.cc[27],self.cc[31],self.cc[49],self.cc[53]) # Shielding
-        #// Top:{} // Bot:{} //Sta:{} Port:{} //Fore:{}//Stern:{}
+        self.cc[58],self.cc[59],self.cc[60]) # Acc
+
+    def smalltanks_ev(self):
+        return "Top:{}:brblue:rblue // Bot:{}:brblue:rblue //Port:{}:brblue:rblue // Star:{}:brblue:rblue //Fore:{}:brblue:rblue//Stern:{}:brblue:rblue".format(
+            self.cc[19],self.cc[23],self.cc[27],self.cc[31],self.cc[49],self.cc[53]) # Shielding
+
     def main_ev(self):
         ret=""
         if self.note[1]:
@@ -200,6 +203,9 @@ class messageStat():
         self.misc_events2=self.misc_ev2()
 
         self.tanks=self.tanks_ev()
+        # self.smalltanks=self.smalltanks_ev()
+        # self.multipercent=self.multipercent_ev()
+
     def genall(self,t,val):
         content={}
         for nb in t:

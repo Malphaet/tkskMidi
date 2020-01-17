@@ -132,12 +132,7 @@ def filled(text,msgtotal,colortitle):
     insertt(text,info,style)
     insertt(text,0,"default")
 
-ctanks=["bred","borange","bgold","bsblue","brblue","bgreen","bred"]
-def tanks(text,msgtotal,colortitle):
-    tankt=msgtotal.split("//") # Split all tank
-    size=4
-    f="{:^7}" # +3 because of the len("+=+")
-    #f="{:^"+str(size+3)+"}"
+def splittank(tankt):
     tanks,nb=[],0
     for tank in tankt: # Split label:value
         label,rpct,colt,coll=tank.split(":")
@@ -150,6 +145,15 @@ def tanks(text,msgtotal,colortitle):
         tanks+=[(label,pct,col,rpct,colt,coll)]
         #size=max(size,len(label))
         nb+=1
+    return tanks,nb
+
+ctanks=["bred","borange","bgold","bsblue","brblue","bgreen","bred"]
+def tanks(text,msgtotal,colortitle):
+    tankt=msgtotal.split("//") # Split all tank
+    size=4
+    f="{:^7}" # +3 because of the len("+=+")
+    #f="{:^"+str(size+3)+"}"
+    tanks,nb=splittank(tankt)
 
     #Building all tanks
     pad=" "*int(size/2)
@@ -173,6 +177,14 @@ def tanks(text,msgtotal,colortitle):
     for tank in tanks:
         insertt(text,f.format(tank[3]+"%"),tank[2])
     insertt(text,0,colortitle)
+
+def minitanks(msgtotal):
+    tankt=msgtotal.split("//")
+    pass
+
+def multipercent(msg):
+    "&color title of section // subsection:percent // subsection:percent ..."
+    pass
 
 def superstyle(text,msg):
     if msg[0]=="!": #Oneline colorcoded
@@ -252,7 +264,6 @@ def threadclient():
                 oldhash=newhash
                 if data!=0:
                     msg=str(data.decode('UTF-8'))
-                    # chk,msg=msg[:6],msg[6:]
                     receive(str(data.decode('UTF-8')),text)
                 else:
                     break
