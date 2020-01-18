@@ -7,6 +7,7 @@ base="""!g+---------------------------------------------------------------------
 !g+-----------------------------
 #g| Inertia compensator // {self.inertia}
 #g| Vital systems // {self.survival}
+#g| Thermal dissipator // {self.thermal}
 #g| {self.vital_events}
 !g+-----------------------------
 #g| Reactor status // {self.reactor}
@@ -26,8 +27,10 @@ base="""!g+---------------------------------------------------------------------
 #g| {self.misc_events2}
 !g+--------------------------------------------------------------------------------------
 
-!g    Oxygen tanks       Accumulator Arrays
+!g               Oxygen tanks       Accumulator Arrays
 @g {self.tanks}
+
+&y {self.multipercent}
 
 !g+-----------------------------
 #g| Users connected {users}
@@ -109,6 +112,9 @@ class messageStat():
     def smalltanks_ev(self):
         return "Top:{}:brblue:rblue // Bot:{}:brblue:rblue //Port:{}:brblue:rblue // Star:{}:brblue:rblue //Fore:{}:brblue:rblue//Stern:{}:brblue:rblue".format(
             self.cc[19],self.cc[23],self.cc[27],self.cc[31],self.cc[49],self.cc[53]) # Shielding
+    def multipercent_ev(self):
+        return "Radiation shielding //Top:{}// Bot:{}//Port:{}//Star:{}//Fore:{}//Stern:{}".format(
+            self.cc[19],self.cc[23],self.cc[27],self.cc[31],self.cc[49],self.cc[53]) # Shielding
 
     def main_ev(self):
         ret=""
@@ -182,6 +188,7 @@ class messageStat():
 
         self.inertia=self.classical(self.cc[20])
         self.survival=self.classical(self.cc[21])
+        self.thermal=self.classical(self.cc[22])
 
         self.reactor=self.classical(self.cc[24])
         self.reactor_pw=self.powerlevel(self.cc[25])
@@ -204,7 +211,7 @@ class messageStat():
 
         self.tanks=self.tanks_ev()
         # self.smalltanks=self.smalltanks_ev()
-        # self.multipercent=self.multipercent_ev()
+        self.multipercent=self.multipercent_ev()
 
     def genall(self,t,val):
         content={}

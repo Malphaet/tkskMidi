@@ -1,4 +1,4 @@
-MIDINAMEIN='Virtual Port 2'
+MIDINAMEIN='Midi Through Port-0'
 import mido,sys
 
 import time
@@ -67,4 +67,4 @@ if __name__ == '__main__':
             for m in cc_test:
                 cmd="cc {} {}".format(m,min(i*6+randint(1,7),127))
                 parsemsg(cmd)
-            time.sleep(1)
+            time.sleep(0.2)

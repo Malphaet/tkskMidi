@@ -24,6 +24,7 @@ class ClientThread(threading.Thread):
     def __init__(self,clientAddress,clientsocket):
         threading.Thread.__init__(self)
         self.csocket = clientsocket
+        self.keepalive=True
 
     def send(self,msg):
         # msg=msg.encode('UTF-8')
@@ -40,13 +41,13 @@ class ClientThread(threading.Thread):
             global_users[name]=1
         print("[Users] : ",showusers())
         global_status.updadeMessage(showusers())
-        self.send(patch.encodehash(messages.handshake.format(name)))
+        self.send(patch.encodehash(messages.handshake.format(name))) # if errror here the user cound isn't diminished
         time.sleep(0.2)
-        while True:
+        while self.keepalive:
             try:
                 self.send(global_status.hmessage())
                 time.sleep(SLEEP_SCHEDULER)
-            except (ConnectionResetError,ConnectionAbortedError):
+            except (ConnectionResetError,ConnectionAbortedError,BrokenPipeError):
                 try:
                     global_users[name]-=1
                     if global_users[name]<0:
@@ -86,7 +87,10 @@ inter=MidiThread(MIDINAME)
 inter.start()
 
 while True:
-    server.listen(1)
-    clientsock, clientAddress = server.accept()
-    newthread = ClientThread(clientAddress, clientsock)
-    newthread.start()
+    try:
+        server.listen(1)
+        clientsock, clientAddress = server.accept()
+        newthread = ClientThread(clientAddress, clientsock)
+        newthread.start()
+    except KeyboardInterrupt:
+        exit() # Clearly not working

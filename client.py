@@ -105,7 +105,8 @@ def writeall(text):
         print(trackme())
         text._tobewritten=[]
 
-colors={"g":"green","G":"bgreen","r":"red","R":"bred","u":"blue","U":"bblue","s":"sblue","S":"bsblue","l":"lgreen","L":"blgreen","o":'orange','O':"borange","y":"rblue","Y":"brblue"}
+colors={"g":"green","G":"bgreen","r":"red","R":"bred","u":"blue","U":"bblue",
+"s":"sblue","S":"bsblue","l":"lgreen","L":"blgreen","o":'orange','O':"borange","y":"rblue","Y":"brblue"}
 def colorform(col):
     try:
         return colors[col]
@@ -149,18 +150,20 @@ def splittank(tankt):
 
 ctanks=["bred","borange","bgold","bsblue","brblue","bgreen","bred"]
 def tanks(text,msgtotal,colortitle):
-    tankt=msgtotal.split("//") # Split all tank
-    size=4
+    # Split all tank
+    tankt=msgtotal.split("//")
+    size=5
     f="{:^7}" # +3 because of the len("+=+")
-    #f="{:^"+str(size+3)+"}"
     tanks,nb=splittank(tankt)
 
     #Building all tanks
+    pre=" "*11
     pad=" "*int(size/2)
-    sepline=(pad+"+=+"+pad)*nb
+    sepline=pre+(pad+"+=+"+pad)*nb
     insertt(text,sepline,colortitle)
     insertt(text,0,colortitle)
     for line in range(5): #build all tanks line by line
+        insertt(text,pre,"default")
         for tank in tanks:
             if tank[1]>4-line:
                 insertt(text,pad+'|',colortitle)
@@ -171,9 +174,12 @@ def tanks(text,msgtotal,colortitle):
         insertt(text,0,colortitle)
     insertt(text,sepline,colortitle)
     insertt(text,0,colortitle)
+    insertt(text,pre,"default")
     for tank in tanks:
         insertt(text,f.format(tank[0][:size+3]),tank[5])
     insertt(text,0,colortitle)
+
+    insertt(text,pre,"default")
     for tank in tanks:
         insertt(text,f.format(tank[3]+"%"),tank[2])
     insertt(text,0,colortitle)
@@ -182,9 +188,29 @@ def minitanks(msgtotal):
     tankt=msgtotal.split("//")
     pass
 
-def multipercent(msg):
+def multipercent(text,msg,colortitle):
     "&color title of section // subsection:percent // subsection:percent ..."
-    pass
+    temp=msg.split("//")
+    title=temp[0].strip(" ")
+    sections=[]
+    for t in temp[1:]:
+        sec,p=t.split(":")
+        col=ctanks[int(int(p)*5/127)]
+        sections+=[(sec,p,col)]
+
+    titles=" "*11
+    for s in sections:
+        titles+='{:^6} '.format(s[0][:6])
+
+    insertt(text,titles,colortitle)
+    insertt(text,0,"default")
+
+    insertt(text,"{:<10} ".format(title[:10]),"default")
+    for s in sections:
+        insertt(text,"[{:>3}%] ".format(s[1]),s[2])
+
+    # insertt(text,pcts,"default")
+    insertt(text,0,"default")
 
 def superstyle(text,msg):
     if msg[0]=="!": #Oneline colorcoded
@@ -193,6 +219,8 @@ def superstyle(text,msg):
         tanks(text,msg[2:],colorform(msg[1]))
     elif msg[0]=="#": # Filled line
         filled(text,msg[2:],colorform(msg[1]))
+    elif msg[0]=="&":
+        multipercent(text,msg[2:],colorform(msg[1]))
     else:
         plain(text,msg,"default")
 
@@ -221,7 +249,6 @@ def connecting():
 def criticalTraceback():
     exc,funct,tb=sys.exc_info()
     code=tb.tb_frame.f_code
-    # traceback.print_exception(exc,funct,tb)
     print(traceback.format_exc())
     print("---")
     traceback.print_exc()
