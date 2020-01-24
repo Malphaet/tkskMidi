@@ -31,6 +31,7 @@ class ClientThread(threading.Thread):
         self.csocket.send(bytes(msg,'UTF-8'))
 
     def run(self):
+        global global_users
         # Getting basic information, mainly name
         data = self.csocket.recv(2048)
         name = data.decode()

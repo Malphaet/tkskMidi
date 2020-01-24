@@ -1,4 +1,4 @@
-MIDINAMEIN='Midi Through Port-0'
+MIDINAMEIN='Midi Through Port-0 1'
 import mido,sys
 
 import time
