@@ -17,7 +17,7 @@ def showusers():
     ret=""
     for user in global_users:
         if global_users[user]>0:
-            ret+=" "+user
+            ret+=" / "+user
     return ret
 
 class ClientThread(threading.Thread):

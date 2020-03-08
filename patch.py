@@ -12,6 +12,7 @@ base="""!g+---------------------------------------------------------------------
 !g+-----------------------------
 #g| Reactor status // {self.reactor}
 #g| Reactor power // {self.reactor_pw}
+#g| Energy consumption // {self.consumed_pw}
 #g| {self.reactor_events}
 !g+-----------------------------
 #g| Propulsion status // {self.propulsion}
@@ -192,6 +193,7 @@ class messageStat():
 
         self.reactor=self.classical(self.cc[24])
         self.reactor_pw=self.powerlevel(self.cc[25])
+        self.consumed_pw=self.powerlevel(self.cc[26])
 
         self.propulsion=self.classical(self.cc[28])
         self.lightfold=self.classical(self.cc[29])

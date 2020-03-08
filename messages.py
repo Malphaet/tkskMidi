@@ -1,6 +1,6 @@
 opening_text0="""#g Checking all systems // Nominal
 
-#g Connection // Waiting for upling // orange
+#g Connection // Waiting for uplink // orange
 
 #g Quality // Good // green
 """
