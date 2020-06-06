@@ -8,7 +8,7 @@ HEIGHT=46
 WINDOWSIZE="1250x910"
 HOST="192.168.1.14"
 PORT=12345
-NAME="Aamstrang Karpov"
+NAME="Tina Mendovar"
 REFRESHINTERVAL=0 # Leave very low
 
 # SERVER CONFIG

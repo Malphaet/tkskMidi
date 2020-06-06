@@ -1,37 +1,27 @@
 base="""!g+--------------------------------------------------------------------------------------
 !g| {title}
 !g+--------------------------------------------------------------------------------------
-#g | Main deck // {self.deck}
-#g| Comunication arrays // {self.comms}
-#g| {self.main_events}
+#g| Global communication array // {self.comm}
+#g| {self.comm_events}
 !g+-----------------------------
-#g| Inertia compensator // {self.inertia}
-#g| Vital systems // {self.survival}
-#g| Thermal dissipator // {self.thermal}
-#g| {self.vital_events}
+#g| Mothership Integrity // {self.integrity}
+#g| Mothership Ammunition // {self.ammu}
+#g| {self.mothership_events}
 !g+-----------------------------
-#g| Reactor status // {self.reactor}
-#g| Reactor power // {self.reactor_pw}
-#g| Energy consumption // {self.consumed_pw}
-#g| {self.reactor_events}
-!g+-----------------------------
-#g| Propulsion status // {self.propulsion}
-#g| Lightfold engines // {self.lightfold}
-#g| Propulsion power // {self.propulsion_pw}
-#g| {self.prop_events}
-!g+-----------------------------
-#g| Docks // {self.docks}
-#g| Medical Bay // {self.medical}
-#g| Quarters // {self.quarters}
-#g| Baracks // {self.baracks}
-#g| {self.misc_events1}
-#g| {self.misc_events2}
+#g| Target 1 // {self.t1}
+#g| Target 2 // {self.t2}
+#g| Target 3 // {self.t3}
+#g| Target 4 // {self.t4}
+#g| Target 5 // {self.t5}
+#g| Target 6 // {self.t6}
+#g| {self.target_events}
 !g+--------------------------------------------------------------------------------------
 
-!g               Oxygen tanks       Accumulator Arrays
-@g {self.tanks}
+!g                                 Squad One
+@g {self.acc}
 
-&y {self.multipercent}
+&y {self.hull}
+&y {self.ammo}
 
 !g+-----------------------------
 #g| Users connected {users}
@@ -105,19 +95,20 @@ class messageStat():
             return "[{:>2}%]//red".format(pct)
         return "[{:>2}%]//bred".format(pct)
 
-    def tanks_ev(self):
-        return "Oxy1:{}:bsblue:sblue // Oxy2:{}:bsblue:sblue // Oxy3:{}:bsblue:sblue // Acc1:{}:bgold:gold // Acc2:{}:bgold:gold // Acc3:{}:bgold:gold".format(
-        self.cc[54],self.cc[55],self.cc[56], # Oxy
-        self.cc[58],self.cc[59],self.cc[60]) # Acc
+    def acc_ev(self):
+        return "Acc1:{}:bgold:gold // Acc2:{}:bgold:gold // Acc3:{}:bgold:gold // Acc4:{}:bgold:gold // Acc5:{}:bgold:gold // Acc6:{}:bgold:gold".format(
+        self.cc[28],self.cc[29],self.cc[30], # Oxy
+        self.cc[46],self.cc[47],self.cc[48]) # Acc
 
-    def smalltanks_ev(self):
-        return "Top:{}:brblue:rblue // Bot:{}:brblue:rblue //Port:{}:brblue:rblue // Star:{}:brblue:rblue //Fore:{}:brblue:rblue//Stern:{}:brblue:rblue".format(
-            self.cc[19],self.cc[23],self.cc[27],self.cc[31],self.cc[49],self.cc[53]) # Shielding
-    def multipercent_ev(self):
-        return "Radiation shielding //Top:{}// Bot:{}//Port:{}//Star:{}//Fore:{}//Stern:{}".format(
+    def hull_ev(self):
+        return "Hull integrity // :{}// :{}// :{}// :{}// :{}// :{}".format(
+            self.cc[50],self.cc[51],self.cc[52],self.cc[54],self.cc[55],self.cc[56]) # Shielding
+
+    def ammo_ev(self):
+        return "Ammunition // :{}// :{}// :{}// :{}// :{}// :{}".format(
             self.cc[19],self.cc[23],self.cc[27],self.cc[31],self.cc[49],self.cc[53]) # Shielding
 
-    def main_ev(self):
+    def comm_ev(self):
         ret=""
         if self.note[1]:
             ret+="Electrical surge ! "
@@ -128,7 +119,7 @@ class messageStat():
             ret="Critical Issue//"+ret+"//bred"
         return ret
 
-    def vital_ev(self):
+    def mothership_ev(self):
         ret=""
         if self.note[4]:
             ret+="Microgravity Malfunction ! "
@@ -140,80 +131,39 @@ class messageStat():
             ret="Critical Issue//"+ret+"//"+color
         return ret
 
-    def reactor_ev(self):
+    def target_ev(self):
         ret=""
         if self.note[7]:
-            ret+="RADIATION LEAK ! "
+            ret+="Target class unknown "
             color="borange"
         if self.note[9]:
-            ret+="REACTOR MELTDOWN ! "
+            ret+="Target lost "
             color="bred"
         if ret != "":
             ret="Critical Issue//"+ret+"//"+color
         return ret
 
-    def prop_ev(self):
-        ret=""
-        if self.note[10]:
-            ret+="System Overheating ! "
-        if self.note[12]:
-            ret+="Systemic Failure !"
-
-        if ret != "":
-            ret="Critical Issue//"+ret+"//bred"
-        return ret
-
-    def misc_ev1(self):
-        ret=""
-        if self.note[13]:
-            ret+="Electrical Fire ! "
-        if self.note[15]:
-            ret+="Hull breach ! "
-        if ret != "":
-            ret="Critical Issue//"+ret+"//bred"
-        return ret
-
-    def misc_ev2(self):
-        ret=""
-        if self.note[16]:
-            ret+="Structural integrity critical ! "
-        if self.note[18]:
-            ret+="Foreign object alert !"
-        if ret != "":
-            ret="Critical Issue//"+ret+"//bred"
-        return ret
-
     def update(self):
-        self.deck=self.classical(self.cc[16])
-        self.comms=self.classical(self.cc[17])
+        self.comm=self.classical(self.cc[16])
 
-        self.inertia=self.classical(self.cc[20])
-        self.survival=self.classical(self.cc[21])
-        self.thermal=self.classical(self.cc[22])
+        self.integrity=self.classical(self.cc[17])
+        self.ammu=self.powerlevel(self.cc[18])
 
-        self.reactor=self.classical(self.cc[24])
-        self.reactor_pw=self.powerlevel(self.cc[25])
-        self.consumed_pw=self.powerlevel(self.cc[26])
+        self.t1=self.powerlevel(self.cc[20])
+        self.t2=self.powerlevel(self.cc[21])
+        self.t3=self.powerlevel(self.cc[22])
+        self.t4=self.powerlevel(self.cc[24])
+        self.t5=self.powerlevel(self.cc[25])
+        self.t6=self.powerlevel(self.cc[26])
 
-        self.propulsion=self.classical(self.cc[28])
-        self.lightfold=self.classical(self.cc[29])
-        self.propulsion_pw=self.powerlevel(self.cc[30])
+        self.mothership_events=self.mothership_ev()
+        self.comm_events=self.comm_ev()
+        self.target_events=self.target_ev()
 
-        self.docks=self.classical(self.cc[46])
-        self.medical=self.classical(self.cc[47])
-        self.quarters=self.classical(self.cc[48])
-        self.baracks=self.classical(self.cc[50])
-
-        self.main_events=self.main_ev()
-        self.vital_events=self.vital_ev()
-        self.reactor_events=self.reactor_ev()
-        self.prop_events=self.prop_ev()
-        self.misc_events1=self.misc_ev1()
-        self.misc_events2=self.misc_ev2()
-
-        self.tanks=self.tanks_ev()
+        self.acc=self.acc_ev()
         # self.smalltanks=self.smalltanks_ev()
-        self.multipercent=self.multipercent_ev()
+        self.hull=self.hull_ev()
+        self.ammo=self.ammo_ev()
 
     def genall(self,t,val):
         content={}
@@ -229,7 +179,7 @@ class messageStat():
         return self._message
 
     def updadeMessage(self,users=""):
-        self._message=base.format(title="I.S.F Esperance : Dashboard", self=self ,users=users)
+        self._message=base.format(title="C.L.S Strike Squad One : Dashboard", self=self ,users=users)
         self._hash=hashmsg(self._message)
         self._hmessage=self._hash+self._message
         return self._message

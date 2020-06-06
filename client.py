@@ -123,7 +123,7 @@ def filled(text,msgtotal,colortitle):
     msg=messaget[0].strip(" ")
     info=messaget[1].strip(" ")
     remaining=max(0,WIDTH-len(msg)-len(info))
-    stylet="default"
+    style="default"
     if len(messaget)==3:
         style=messaget[2]
     elif len(messaget)==2:

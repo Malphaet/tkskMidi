@@ -73,7 +73,7 @@ class MidiThread(threading.Thread):
 
     def run(self):
         for msg in self.interface:
-            # print(msg) # For debug purposes
+            #print(msg) # For debug purposes
             global_status.updateMessage(msg)
             global_status.updadeMessage(showusers())
 
