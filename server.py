@@ -1,4 +1,6 @@
 #!/bin/python3
+# -*- coding: utf-8 -*-
+
 import threading,socket,time
 import patch,messages
 import mido
@@ -34,31 +36,38 @@ class ClientThread(threading.Thread):
         global global_users
         # Getting basic information, mainly name
         data = self.csocket.recv(2048)
-        name = data.decode()
-        print ("[{}] {} connected @ {} ".format(time.strftime("%X"),name,clientAddress))
-        try:
-            global_users[name]+=1
-        except:
-            global_users[name]=1
-        print("[Users] : ",showusers())
-        global_status.updadeMessage(showusers())
-        self.send(patch.encodehash(messages.handshake.format(name))) # if errror here the user cound isn't diminished
-        time.sleep(0.2)
-        while self.keepalive:
+        name = data.decode("UTF-8")
+        if name[:3]=="GET":
+            print("[{}] Pinged by {}".format(time.strftime("%X"),clientAddress))
+            global_status.updadeMessage(showusers())
+            self.send(global_status.hmessage())
+            self.csocket.close()
+            self.keepalive=False
+        else:
+            print ("[{}] {} connected @ {} ".format(time.strftime("%X"),name,clientAddress))
             try:
-                self.send(global_status.hmessage())
-                time.sleep(SLEEP_SCHEDULER)
-            except (ConnectionResetError,ConnectionAbortedError,BrokenPipeError):
+                global_users[name]+=1
+            except:
+                global_users[name]=1
+            print("[Users] : ",showusers())
+            global_status.updadeMessage(showusers())
+            self.send(patch.encodehash(messages.handshake.format(name))) # if errror here the user cound isn't decreased by one
+            time.sleep(0.2)
+            while self.keepalive:
                 try:
-                    global_users[name]-=1
-                    if global_users[name]<0:
-                        global_users[name]=0 # Could also drop entry
-                except:
-                    pass
-                print ("[{}] {}@{} disconnected".format(time.strftime("%X"),name, clientAddress))
-                print ("[Users] : ",showusers())
-                global_status.updadeMessage(showusers())
-                break
+                    self.send(global_status.hmessage())
+                    time.sleep(SLEEP_SCHEDULER)
+                except (ConnectionResetError,ConnectionAbortedError,BrokenPipeError):
+                    try:
+                        global_users[name]-=1
+                        if global_users[name]<0:
+                            global_users[name]=0 # Could also drop entry
+                    except:
+                        pass
+                    print ("[{}] {}@{} disconnected".format(time.strftime("%X"),name, clientAddress))
+                    print ("[Users] : ",showusers())
+                    global_status.updadeMessage(showusers())
+                    break
 
 
 class MidiThread(threading.Thread):
